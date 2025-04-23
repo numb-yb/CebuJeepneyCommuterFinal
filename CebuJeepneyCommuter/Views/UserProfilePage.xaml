@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CebuJeepneyCommuter.Views.UserProfilePage"
+             xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
+             Title="UserProfilePage"
+             BackgroundColor="White">
+
+    <ContentPage.BindingContext>
+        <viewmodel:UserProfileViewModel />
+         </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <StackLayout Padding="20">
+            <!-- Return Back Button -->
+            <Button Text="◀"
+                    BackgroundColor="LightGray"
+                    TextColor="Black"
+                    CornerRadius="10"
+                    Padding="0"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    FontSize="20"
+                    HorizontalOptions="Start"
+                    Clicked="OnBackButtonClicked"/>
+
+            <!-- Profile Header with Edit Profile -->
+            <Label Text="PROFILE" 
+                   TextColor="Black"
+                   FontSize="24" 
+                   HorizontalOptions="Center"
+                   FontAttributes="Bold"/>
+            <Image Source="profile2.png" 
+                   WidthRequest="100" 
+                   HeightRequest="100" 
+                   HorizontalOptions="Center"/>
+            <Label Text="Edit Profile"
+                   TextColor="Black"
+                   HorizontalOptions="Center"
+                   FontAttributes="Italic"/>
+
+            <!-- Input Fields -->
+            <!-- UserName Box -->
+            <Frame CornerRadius="10"
+                   BorderColor="Gray"
+                   BackgroundColor="White"
+                   Padding="10"
+                   HasShadow="False"
+                   Margin="0,5">
+                <Entry Placeholder="UserName"
+                       Text="{Binding UserName}"
+                       BackgroundColor="Transparent"
+                       TextColor="Black" />
+            </Frame>
+
+            <!-- Email Box -->
+            <Frame CornerRadius="10"
+                   BorderColor="Gray"
+                   BackgroundColor="White"
+                   Padding="10"
+                   HasShadow="False"
+                   Margin="0,5">
+                <Entry Placeholder="Email"
+                       Text="{Binding Email}"
+                       Keyboard="Email"
+                       BackgroundColor="Transparent"
+                       TextColor="Black" />
+            </Frame>
+
+            <!-- Phone Number Box -->
+            <Frame CornerRadius="10"
+                   BorderColor="Gray"
+                   BackgroundColor="White"
+                   Padding="10"
+                   HasShadow="False"
+                   Margin="0,5">
+                <Entry Placeholder="Phone Number"
+                       Text="{Binding PhoneNumber}"
+                       Keyboard="Telephone"
+                       BackgroundColor="Transparent"
+                       TextColor="Black" />
+            </Frame>
+
+            <!-- Password Box -->
+            <Frame CornerRadius="10"
+                   BorderColor="Gray"
+                   BackgroundColor="White"
+                   Padding="10"
+                   HasShadow="False"
+                   Margin="0,5">
+                <Entry Placeholder="Password"
+                       Text="{Binding Password}"
+                       IsPassword="True"
+                       BackgroundColor="Transparent"
+                       TextColor="Black" />
+            </Frame>
+
+
+            <!-- Logout Button -->
+            <Button Text="Log out"
+                    BackgroundColor="Black"
+                    TextColor="White"
+                    Command="{Binding LogoutCommand}" />
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

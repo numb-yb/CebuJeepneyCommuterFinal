@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CebuJeepneyCommuter.Views.UserHomePage"
+             xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
+             x:DataType="viewmodel:UserHomeViewModel"
+             Title="UserHomePage"
+             BackgroundColor="#F0F0F0">
+
+    <ContentPage.BindingContext>
+        <viewmodel:UserHomeViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Content>
+        <VerticalStackLayout Padding="20">
+
+            <!-- Header -->
+            <Grid BackgroundColor="#D3D3D3"
+                  Padding="10"
+                  ColumnDefinitions="Auto,*,Auto,Auto,Auto"
+                  VerticalOptions="Center"
+                  HorizontalOptions="FillAndExpand">
+
+                <!-- Logo -->
+                <Image Source="logo2.jpg"
+                       HeightRequest="50"
+                       Grid.Column="0" />
+
+                <!-- App Title -->
+                <Label Text="Cebu Jeepney Commuters Guide"
+                       TextColor="Black"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Start"
+                       Grid.Column="1" />
+
+                <!-- Notification Icon -->
+                <Image Source="notification2.png"
+                       WidthRequest="25"
+                       HeightRequest="25"
+                       VerticalOptions="Center"
+                       Margin="10,0"
+                       Grid.Column="2" />
+
+                <!-- User Info (Name and Email) -->
+                <StackLayout Grid.Column="3"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="2">
+                    <Label Text="FirstName LastName"
+                                 TextColor="Black"
+                                 FontAttributes="Bold"
+                                 FontSize="14"
+                                 HorizontalTextAlignment="Center"/>
+                    <Label Text="@gmail"
+                           TextColor="Black"
+                           FontSize="12"
+                           HorizontalTextAlignment="Center"/>
+                </StackLayout>
+
+                <!-- Profile Icon -->
+                <Image Source="profile2.png"
+                       HeightRequest="40"
+                       WidthRequest="40"
+                       VerticalOptions="Center"
+                       Grid.Column="4">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnProfileTapped" />
+                    </Image.GestureRecognizers>
+                </Image>
+
+            </Grid>
+
+            <!-- Search Bar -->
+            <Button Text="Search Routes"
+                    BackgroundColor="Black"
+                    TextColor="White"
+                    Margin="0,10"
+                    Clicked="OnSearchRoutesClicked"/>
+
+            <!-- Bus Code Entry -->
+            <Button Text="Bus Code"
+                    BackgroundColor="Black"
+                    TextColor="White"
+                    Margin="0,10"
+                    Clicked="OnBusCodeClicked"/>
+
+            <!-- Passenger Type Dropdown -->
+            <Label Text="Passenger Type"
+                   TextColor="Black"
+                   FontAttributes="Bold"
+                   Margin="0,10,0,0"/>
+
+            <Picker Title="Select Type"
+                    TextColor="Black"
+                    ItemsSource="{Binding PassengerTypes}"
+                    SelectedItem="{Binding SelectedPassengerType}"
+                    BackgroundColor="White"/>
+
+            <!-- Button to Proceed -->
+            <Button Text="PROCEED TO PAYMENT" 
+                    BackgroundColor="Black" 
+                    TextColor="White" 
+                    Margin="0,20"
+                    Clicked="OnProceedToPaymentClicked"/>
+
+        </VerticalStackLayout>
+    </ContentPage.Content>
+</ContentPage>

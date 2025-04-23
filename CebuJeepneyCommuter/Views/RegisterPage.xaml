@@ -1,0 +1,60 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:CebuJeepneyCommuter"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
+             x:DataType="viewmodel:RegisterPageViewModel"
+             x:Class="CebuJeepneyCommuter.Views.RegisterPage"
+             Title="RegisterPage"
+             BackgroundColor="White"
+             Padding="20">
+
+    <ContentPage.BindingContext>
+        <viewmodel:RegisterPageViewModel />
+        </ContentPage.BindingContext>
+
+    <StackLayout VerticalOptions="CenterAndExpand" 
+                 HorizontalOptions="CenterAndExpand">
+
+        <Label Text="CREATE NEW ACCOUNT"
+               FontSize="24"
+               HorizontalTextAlignment="Center"
+               TextColor="Black" />
+
+        <Label Text="Already Registered? Login"
+               FontSize="14"
+               HorizontalTextAlignment="Center"
+               TextColor="Gray" />
+
+        <Entry Placeholder="NAME" 
+               Text="{Binding Name}" 
+               TextColor="Black"/>
+        <Entry Placeholder="EMAIL" 
+               Keyboard="Email" 
+               Text="{Binding Email}" 
+               TextColor="Black"/>
+        <Entry Placeholder="NUMBER"
+               Keyboard="Telephone" 
+               Text="{Binding Number}" 
+               TextColor="Black"/>
+        <Entry Placeholder="PASSWORD" 
+               IsPassword="True" 
+               Text="{Binding Password}" 
+               TextColor="Black"/>
+        <Entry Placeholder="CONFIRM PASSWORD" 
+               IsPassword="True"
+               Text="{Binding ConfirmPassword}" 
+               TextColor="Black"/>
+        <DatePicker MinimumDate="1900-01-01"
+                    MaximumDate="{x:Static sys:DateTime.Now}"
+                    Date="{Binding SelectedDate}" 
+                    TextColor="Black" />
+        <Button Text="Sign up"
+                BackgroundColor="Black"
+                TextColor="White"
+                Margin="0,20,0,0"
+                Command="{Binding SignUpCommand}" />
+
+    </StackLayout>
+
+</ContentPage>

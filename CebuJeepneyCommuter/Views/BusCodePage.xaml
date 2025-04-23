@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
+             x:DataType="viewmodel:BusCodePageViewModel"
+             x:Class="CebuJeepneyCommuter.Views.BusCodePage"
+             Title="BusCodePage">
+
+    <ContentPage.BindingContext>
+        <viewmodel:BusCodePageViewModel />
+        </ContentPage.BindingContext>
+
+    <StackLayout Padding="20">
+
+        <!-- Header -->
+        <Label Text="Bus Code"
+               FontSize="24"
+               HorizontalOptions="Center"
+               VerticalOptions="Start" />
+
+        <!-- Navigation Back Button -->
+        <Button Text="◀ Back"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                Margin="0,10,0,20" 
+                Clicked="OnBackButtonClicked" />
+
+        <!-- Bus Type Dropdown -->
+        <Label Text="Bus Type"
+               FontSize="18"
+               Margin="0,20,0,5"/>
+        <Picker Title="Select Bus Type"
+               ItemsSource="{Binding BusTypes}"
+               SelectedItem="{Binding SelectedBusType}" />
+
+        <!-- Bus Classification Dropdown -->
+        <Picker Title="Select Bus Classification"
+                ItemsSource="{Binding Classifications}"
+                 SelectedItem="{Binding SelectedClassification}" />
+
+
+        <!-- Bus Available Dropdown -->
+        <Picker Title="Select Available Bus"
+                ItemsSource="{Binding AvailableBuses}"
+                SelectedItem="{Binding SelectedAvailableBus}" />
+
+
+        <!-- Show on Map Button -->
+        <Button Text="Show on map"
+                Command="{Binding ShowMapCommand}"
+                BackgroundColor="White"
+                TextColor="Black"
+                VerticalOptions="End"
+                Margin="0,40,0,0"/>
+
+    </StackLayout>
+
+</ContentPage>

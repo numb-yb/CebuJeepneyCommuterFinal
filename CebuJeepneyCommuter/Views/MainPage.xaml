@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CebuJeepneyCommuter.Views.MainPage"
+             BackgroundColor="#F0F0F0">
+
+    <StackLayout Padding="30">
+
+        <Label Text="Cebu Jeepney Commuters Guide"
+               FontSize="24"
+               HorizontalOptions="Center"
+               TextColor="Black"/>
+
+        <Label Text="Welcome back"
+               FontSize="18"
+               HorizontalOptions="Center"
+               TextColor="Gray"/>
+
+        <Label Text="Please enter your details"
+               FontSize="14"
+               HorizontalOptions="Center"
+               TextColor="Gray"
+               Margin="0,0,0,20"/>
+
+        <Entry Placeholder="Email address" 
+               Margin="0,0,0,10" 
+               BackgroundColor="White"
+               TextColor="Black" />
+
+        <Entry Placeholder="Password" 
+               IsPassword="True" 
+               BackgroundColor="White" 
+               TextColor="Black" />
+
+        <CheckBox x:Name="RememberMe"
+                   Color="Black" 
+                   BackgroundColor="Transparent" 
+                   VerticalOptions="Center" />
+        <Label Text="Remember me" 
+               VerticalOptions="Center" 
+               TextColor="Black" />
+
+        <Button Text="Sign In" 
+                BackgroundColor="Black" 
+                TextColor="White"
+                Margin="0,20,0,10"
+                Clicked="OnSignInClicked" />
+
+
+        <Button Text="Sign In with Google" 
+                BackgroundColor="White" 
+                BorderColor="Black" 
+                TextColor="Black" 
+                BorderWidth="1"
+                Clicked="OnGoogleSignInClicked" />
+
+        <Label x:Name="SignUpLabel"
+               Text="Don't have an account? Sign up"
+               HorizontalOptions="Center"
+               TextColor="Black">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnSignUpTapped" />
+            </Label.GestureRecognizers>
+        </Label>
+
+        <Label Text="Admin? Sign in here"
+               TextColor="Blue"
+               HorizontalOptions="Center">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnAdminLoginTapped"/>
+            </Label.GestureRecognizers>
+        </Label>
+    </StackLayout>
+</ContentPage>

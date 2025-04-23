@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
+             x:Class="CebuJeepneyCommuter.Views.PaymentPage"
+             Title="Payment"
+             BackgroundColor="#F0F0F0">
+
+    <!-- ViewModel Binding -->
+    <ContentPage.BindingContext>
+        <viewmodel:PaymentPageViewModel />
+    </ContentPage.BindingContext>
+    <ScrollView>
+        <VerticalStackLayout Padding="10" Spacing="15">
+
+            <Frame CornerRadius="25" BackgroundColor="White" HasShadow="False" Padding="0" >
+                <Grid ColumnDefinitions="Auto,*" Padding="10">
+                    <!-- Tappable Back Arrow -->
+                    <Label Text="◀"
+                       TextColor="black"
+                       FontSize="20"
+                       VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding GoBackCommand}" CommandParameter="search" />
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <!-- Title -->
+                    <Label Grid.Column="1"
+                       TextColor="Black"
+                       Text="Payment"
+                       VerticalOptions="Center"
+                       FontSize="16" />
+                </Grid>
+            </Frame>
+
+            <!-- Fare Calculator Section -->
+            <!-- Fare Calculator Section (Gray Container, Black Table) -->
+            <Frame BackgroundColor="Gray" Padding="10" CornerRadius="5">
+                <Frame BorderColor="Black"
+           Padding="10"
+           HasShadow="False"
+           BackgroundColor="White">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Fare Calculator"
+                   FontAttributes="Bold"
+                   TextColor="Black"
+                   HorizontalOptions="Center" />
+
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Text="From:" TextColor="Black" />
+                            <Entry Text="{Binding From}" Grid.Column="1" Placeholder="Origin" TextColor="Black" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Text="To:" TextColor="Black" />
+                            <Entry Text="{Binding To}" Grid.Column="1" Placeholder="Destination" TextColor="Black" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Text="Price:" TextColor="Black" />
+                            <Entry Text="{Binding Price}" Keyboard="Numeric" Grid.Column="1" TextColor="Black" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Text="Discount:" TextColor="Black" />
+                            <Entry Text="{Binding Discount}" Keyboard="Numeric" Grid.Column="1" TextColor="Black" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Label Text="Total Fare:" TextColor="Black" />
+                            <Label Text="{Binding TotalFare}"
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       Grid.Column="1" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+            </Frame>
+            
+            <!-- Summary Section -->
+            <Frame BackgroundColor="#D3D3D3" 
+                   Padding="10" 
+                   CornerRadius="10">
+                <Frame BorderColor="Black" Padding="15" HasShadow="False" BackgroundColor="White">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Summary"
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               TextColor="Black"
+                               HorizontalOptions="Center" />
+
+                        <Grid ColumnDefinitions="*,*,*,*,*,*" Padding="5">
+                            <Label Text="Code" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="Origin" Grid.Column="1" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="Destination" Grid.Column="2" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="Fare" Grid.Column="3" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="Estimated Arrival" Grid.Column="4" FontAttributes="Bold" TextColor="Black"/>
+                            <Label Text="Date" Grid.Column="5" FontAttributes="Bold" TextColor="Black"/>
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding SummaryItems}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="*,*,*,*,*,*" Padding="5">
+                                        <Label Text="{Binding Code}" TextColor="Black"/>
+                                        <Label Text="{Binding Origin}" Grid.Column="1" TextColor="Black"/>
+                                        <Label Text="{Binding Destination}" Grid.Column="2" TextColor="Black"/>
+                                        <Label Text="{Binding Fare}" Grid.Column="3" TextColor="Black"/>
+                                        <Label Text="{Binding EstimatedArrival}" Grid.Column="4" TextColor="Black"/>
+                                        <Label Text="{Binding Date}" Grid.Column="5" TextColor="Black"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
+            </Frame>
+
+            <!-- Payment Button -->
+            <Button Text="Payment"
+                    BackgroundColor="Black"
+                    TextColor="White"
+                    FontSize="18"
+                    HeightRequest="50"
+                    Command="{Binding PayCommand}" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

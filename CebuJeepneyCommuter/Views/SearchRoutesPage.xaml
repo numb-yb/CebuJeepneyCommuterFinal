@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
+             x:Class="CebuJeepneyCommuter.Views.SearchRoutesPage"
+             x:DataType="viewmodel:SearchRoutesViewModel"
+             Title="Search Routes"
+             BackgroundColor="White">
+
+    <ContentPage.BindingContext>
+        <viewmodel:SearchRoutesViewModel />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout Padding="50" Spacing="-10">
+
+        <!-- Top Navigation Bar -->
+        <Frame CornerRadius="25" BackgroundColor="White" HasShadow="False" Padding="0">
+            <Grid ColumnDefinitions="Auto,*" Padding="10">
+                <Label Text="◀"
+                       TextColor="black"
+                       FontSize="20"
+                       VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding GoBackCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Grid.Column="1"
+                       Text="Search Routes"
+                       FontSize="16"
+                       TextColor="Black"
+                       VerticalOptions="Center" />
+            </Grid>
+        </Frame>
+
+        <!-- Form Input & Button Area -->
+        <Frame BackgroundColor="#D3D3D3"
+               CornerRadius="0"
+               BorderColor="White"
+               Padding="20"
+               Margin="0,10,0,0"
+               HeightRequest="300">
+
+            <Grid RowDefinitions="Auto,*,Auto">
+                <VerticalStackLayout Spacing="40" Grid.Row="1">
+                    <Frame CornerRadius="25" BorderColor="Black" HasShadow="False" Padding="10,5" BackgroundColor="Black">
+                        <Entry Placeholder="Origin"
+                               Text="{Binding Origin}"
+                               BackgroundColor="Transparent"
+                               TextColor="White" />
+                    </Frame>
+
+                    <Frame CornerRadius="25" BorderColor="Black" HasShadow="False" Padding="10,5" BackgroundColor="Black">
+                        <Entry Placeholder="Destination"
+                               Text="{Binding Destination}"
+                               BackgroundColor="Transparent"
+                               TextColor="White" />
+                    </Frame>
+                </VerticalStackLayout>
+
+                <!-- Show on Map Button -->
+                <Frame CornerRadius="25" BorderColor="White" HasShadow="False" Padding="0"
+                       Grid.Row="2" HorizontalOptions="Center">
+                    <Button Text="Show on map"
+                            Command="{Binding ShowMapCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
+                            BorderColor="White"
+                            CornerRadius="25"
+                            WidthRequest="250"
+                            HeightRequest="40" />
+                </Frame>
+            </Grid>
+        </Frame>
+
+        <!-- Map Placeholder -->
+        <Frame BackgroundColor="LightGray"
+               CornerRadius="10"
+               Padding="0"
+               Margin="0,20,0,0"
+               HeightRequest="300"
+               HasShadow="False">
+            <!-- Map control can be placed here in future -->
+            <Label Text="Map Preview" HorizontalOptions="Center" VerticalOptions="Center" TextColor="DarkGray"/>
+        </Frame>
+
+    </VerticalStackLayout>
+</ContentPage>
