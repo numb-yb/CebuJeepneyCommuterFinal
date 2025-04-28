@@ -46,14 +46,6 @@
                 Margin="0,20,0,10"
                 Clicked="OnSignInClicked" />
 
-
-        <Button Text="Sign In with Google" 
-                BackgroundColor="White" 
-                BorderColor="Black" 
-                TextColor="Black" 
-                BorderWidth="1"
-                Clicked="OnGoogleSignInClicked" />
-
         <Label x:Name="SignUpLabel"
                Text="Don't have an account? Sign up"
                HorizontalOptions="Center"
