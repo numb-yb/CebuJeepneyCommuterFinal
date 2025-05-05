@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CebuJeepneyCommuter.ViewModels;
 using Microsoft.Maui.Controls;
 
 namespace CebuJeepneyCommuter.Views;
@@ -12,6 +13,6 @@ public partial class RegisterPage : ContentPage
     public RegisterPage()
     {
         InitializeComponent();
-        BindingContext = this;
+        BindingContext = new RegisterPageViewModel();
     }
 }

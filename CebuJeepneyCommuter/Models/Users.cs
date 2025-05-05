@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace CebuJeepneyCommuter.Models
 {
-    internal class Users
+    public class User
     {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Number { get; set; }
+        public string Password { get; set; }
+        public DateTime BirthDate { get; set; }
     }
 }
