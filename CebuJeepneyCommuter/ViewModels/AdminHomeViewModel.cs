@@ -5,149 +5,102 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
+using CebuJeepneyCommuter.Models;
+using CebuJeepneyCommuter.Services;
 
 namespace CebuJeepneyCommuter.ViewModels
 {
     public class AdminHomeViewModel : INotifyPropertyChanged
     {
+        private readonly AdminService _adminService = new();
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        // View state properties
-        private bool _isMinimumRateVisible = true;
-        public bool IsMinimumRateVisible
+        // Users list for UI binding
+        public ObservableCollection<User> Users { get; set; } = new();
+
+        private User _selectedUser;
+        public User SelectedUser
         {
-            get => _isMinimumRateVisible;
-            set => SetProperty(ref _isMinimumRateVisible, value);
+            get => _selectedUser;
+            set => SetProperty(ref _selectedUser, value);
         }
 
-        private bool _isCreateRouteVisible = false;
-        public bool IsCreateRouteVisible
+        public ICommand LoadUsersCommand => new Command(async () =>
         {
-            get => _isCreateRouteVisible;
-            set => SetProperty(ref _isCreateRouteVisible, value);
-        }
-
-        // Data binding for pickers
-        public ObservableCollection<string> VehicleTypes { get; set; } = new()
-        {
-            "Jeepney", "Beep", "Mybus"
-        };
-
-        public ObservableCollection<string> Routes { get; set; } = new()
-        {
-            "Route A", "Route B", "Route C"
-        };
-
-        // Form entries
-        private string _selectedVehicleType;
-        public string SelectedVehicleType
-        {
-            get => _selectedVehicleType;
-            set => SetProperty(ref _selectedVehicleType, value);
-        }
-
-        private string _selectedRoute;
-        public string SelectedRoute
-        {
-            get => _selectedRoute;
-            set => SetProperty(ref _selectedRoute, value);
-        }
-
-        private string _minimumRate;
-        public string MinimumRate
-        {
-            get => _minimumRate;
-            set => SetProperty(ref _minimumRate, value);
-        }
-
-        private string _routeCode;
-        public string RouteCode
-        {
-            get => _routeCode;
-            set => SetProperty(ref _routeCode, value);
-        }
-
-        private string _startStop;
-        public string StartStop
-        {
-            get => _startStop;
-            set => SetProperty(ref _startStop, value);
-        }
-
-        private string _endStop;
-        public string EndStop
-        {
-            get => _endStop;
-            set => SetProperty(ref _endStop, value);
-        }
-
-        private string _newMinimumPrice;
-        public string NewMinimumPrice
-        {
-            get => _newMinimumPrice;
-            set => SetProperty(ref _newMinimumPrice, value);
-        }
-
-        // Commands
-        public ICommand ShowMinimumRateCommand => new Command(() =>
-        {
-            IsMinimumRateVisible = true;
-            IsCreateRouteVisible = false;
+            var users = await _adminService.GetAllUsersAsync();
+            Users.Clear();
+            foreach (var user in users)
+                Users.Add(user);
         });
 
-        public ICommand ShowCreateRouteCommand => new Command(() =>
+        public ICommand AddUserCommand => new Command(async () =>
         {
-            IsMinimumRateVisible = false;
-            IsCreateRouteVisible = true;
-        });
-
-        public ICommand SaveRouteCommand => new Command(() =>
-        {
-            if (string.IsNullOrWhiteSpace(RouteCode) ||
-                string.IsNullOrWhiteSpace(StartStop) ||
-                string.IsNullOrWhiteSpace(EndStop) ||
-                string.IsNullOrWhiteSpace(NewMinimumPrice) ||
-                string.IsNullOrWhiteSpace(SelectedVehicleType))
+            if (string.IsNullOrWhiteSpace(NewUserName) || string.IsNullOrWhiteSpace(NewUserEmail))
             {
-                Application.Current.MainPage.DisplayAlert("Error", "Please fill in all required fields.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Validation", "Name and Email are required", "OK");
                 return;
             }
 
-            var newRoute = $"{RouteCode} - {StartStop} to {EndStop} ({SelectedVehicleType}) - ₱{NewMinimumPrice}";
-            Routes.Add(newRoute);
+            var newUser = new User
+            {
+                Name = NewUserName,
+                Email = NewUserEmail,
+                PhoneNumber = NewUserPhone,
+                Password = NewUserPassword
+            };
 
-            Application.Current.MainPage.DisplayAlert("Success", "Route saved successfully!", "OK");
-
-            // Clear form fields
-            RouteCode = StartStop = EndStop = NewMinimumPrice = null;
+            await _adminService.AddUserAsync(newUser);
+            Users.Add(newUser);
+            ClearNewUserFields();
         });
 
-        public ICommand UpdateRateCommand => new Command(() =>
+        public ICommand DeleteUserCommand => new Command(async () =>
         {
-            if (string.IsNullOrWhiteSpace(SelectedVehicleType) ||
-                string.IsNullOrWhiteSpace(SelectedRoute) ||
-                string.IsNullOrWhiteSpace(MinimumRate))
+            if (SelectedUser == null)
             {
-                Application.Current.MainPage.DisplayAlert("Error", "Please select a route and vehicle type, and enter a new minimum rate.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Error", "No user selected", "OK");
                 return;
             }
 
-            Application.Current.MainPage.DisplayAlert("Success", $"Minimum rate for {SelectedRoute} ({SelectedVehicleType}) updated to ₱{MinimumRate}.", "OK");
-
-            // Clear minimum rate
-            MinimumRate = null;
+            await _adminService.DeleteUserAsync(SelectedUser.Email);
+            Users.Remove(SelectedUser);
         });
 
-        // Helper methods
+        public ICommand UpdateUserCommand => new Command(async () =>
+        {
+            if (SelectedUser == null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "No user selected", "OK");
+                return;
+            }
+
+            await _adminService.UpdateUserAsync(SelectedUser);
+            await Application.Current.MainPage.DisplayAlert("Success", "User updated", "OK");
+        });
+
+        // Fields for adding new user
+        public string NewUserName { get => _newUserName; set => SetProperty(ref _newUserName, value); }
+        public string NewUserEmail { get => _newUserEmail; set => SetProperty(ref _newUserEmail, value); }
+        public string NewUserPhone { get => _newUserPhone; set => SetProperty(ref _newUserPhone, value); }
+        public string NewUserPassword { get => _newUserPassword; set => SetProperty(ref _newUserPassword, value); }
+
+        private string _newUserName;
+        private string _newUserEmail;
+        private string _newUserPhone;
+        private string _newUserPassword;
+
+        private void ClearNewUserFields()
+        {
+            NewUserName = NewUserEmail = NewUserPhone = NewUserPassword = null;
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         protected void SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
         {
             if (EqualityComparer<T>.Default.Equals(backingStore, value)) return;
-
             backingStore = value;
             OnPropertyChanged(propertyName);
         }

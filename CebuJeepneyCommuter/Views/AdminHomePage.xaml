@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
              x:Class="CebuJeepneyCommuter.Views.AdminHomePage"
-             Title="AdminHomePage">
+             Title="Admin Home Page">
 
     <ContentPage.BindingContext>
         <viewmodel:AdminHomeViewModel />
-        </ContentPage.BindingContext>
+    </ContentPage.BindingContext>
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -16,33 +16,34 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <StackLayout Grid.Column="0" 
-                     BackgroundColor="LightGray" 
-                     Padding="10">
+        <StackLayout Grid.Column="0" BackgroundColor="LightGray" Padding="10">
             <Label Text="ADMIN DASHBOARD"
                    TextColor="Black"
                    FontSize="24"
                    FontAttributes="Bold"/>
-            <Button Text="Change Minimum Rate" 
+
+            <Button Text="Change Minimum Rate"
                     Clicked="OnChangeMinimumRateClicked"/>
-            <Button Text="Create New Route" 
+            <Button Text="Create New Route"
                     Clicked="OnCreateNewRouteClicked"/>
-            <Button Text="Log Out" 
-                    Clicked="OnLogoutClicked" 
-                    Margin="0,20,0,0" 
-                    BackgroundColor="Blue" 
+            <Button Text="Manage Users"
+                    Clicked="OnManageUsersClicked"/>
+
+            <Button Text="Log Out"
+                    Clicked="OnLogoutClicked"
+                    Margin="0,20,0,0"
+                    BackgroundColor="Blue"
                     TextColor="Black"/>
         </StackLayout>
 
         <!-- Main Content -->
-        <StackLayout Grid.Column="1" 
-                     Padding="20">
-            <!-- Change Minimum Rate View -->
-            <ContentView x:Name="MinimumRateView" 
-                         IsVisible="True">
+        <StackLayout Grid.Column="1" Padding="20">
+
+            <!-- Minimum Rate View -->
+            <ContentView x:Name="MinimumRateView" IsVisible="True">
                 <StackLayout>
-                    <Label Text="Change Minimum Rate" 
-                           FontSize="24" 
+                    <Label Text="Change Minimum Rate"
+                           FontSize="24"
                            FontAttributes="Bold"/>
 
                     <Label Text="Vehicle Type:"/>
@@ -56,13 +57,13 @@
                             SelectedItem="{Binding SelectedRoute}" />
 
                     <Label Text="New Minimum Rate:"/>
-                    <Entry x:Name="minimumRateEntry" 
-                           Placeholder="₱ : " 
+                    <Entry x:Name="minimumRateEntry"
+                           Placeholder="₱ : "
                            Keyboard="Numeric"/>
 
-                    <StackLayout Orientation="Horizontal" 
-                                 HorizontalOptions="Center" 
-                                 Spacing="20" 
+                    <StackLayout Orientation="Horizontal"
+                                 HorizontalOptions="Center"
+                                 Spacing="20"
                                  Margin="0,20,0,0">
                         <Button Text="Update Rate"/>
                         <Button Text="Cancel"/>
@@ -70,17 +71,14 @@
                 </StackLayout>
             </ContentView>
 
-            <!-- Create New Route View -->
-            <ContentView x:Name="CreateRouteView" 
-                         IsVisible="False">
+            <!-- Create Route View -->
+            <ContentView x:Name="CreateRouteView" IsVisible="False">
                 <StackLayout>
                     <Label Text="Create New Route"
                            FontSize="24"
                            FontAttributes="Bold" />
 
-                    <Grid ColumnSpacing="10"
-                          RowSpacing="15"
-                          Margin="0,20,0,0">
+                    <Grid ColumnSpacing="10" RowSpacing="15" Margin="0,20,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -97,66 +95,91 @@
 
                         <!-- Route Code -->
                         <Label Text="Route Code:"
-                               Grid.Row="0"
-                               Grid.Column="0"
+                               Grid.Row="0" Grid.Column="0"
                                VerticalTextAlignment="Center"/>
                         <Entry x:Name="routeCodeEntry"
                                Placeholder="Enter Route Code"
-                               Grid.Row="0"
-                               Grid.Column="1"
+                               Grid.Row="0" Grid.Column="1"
                                Grid.ColumnSpan="2"/>
 
                         <!-- Vehicle Type -->
                         <Label Text="Vehicle Type:"
-                               Grid.Row="1"
-                               Grid.Column="0"
-                               VerticalTextAlignment="Center" />
-
+                               Grid.Row="1" Grid.Column="0"
+                               VerticalTextAlignment="Center"/>
                         <Picker Title="Select Vehicle"
-                                Grid.Row="1"
-                                Grid.Column="1"
+                                Grid.Row="1" Grid.Column="1"
                                 Grid.ColumnSpan="2"
                                 ItemsSource="{Binding VehicleTypes}"
                                 SelectedItem="{Binding SelectedCreateRouteVehicleType}" />
 
                         <!-- Stops -->
                         <Label Text="Stops:"
-                               Grid.Row="2"
-                               Grid.Column="0"
+                               Grid.Row="2" Grid.Column="0"
                                VerticalTextAlignment="Center"/>
                         <Picker x:Name="stop1Picker"
                                 Title="Start Stop"
-                                Grid.Row="2"
-                                Grid.Column="1"/>
+                                Grid.Row="2" Grid.Column="1"/>
                         <Picker x:Name="stop2Picker"
                                 Title="End Stop"
-                                Grid.Row="2"
-                                Grid.Column="2"/>
+                                Grid.Row="2" Grid.Column="2"/>
                         <Button Text="Add Stop"
-                                Grid.Row="3"
-                                Grid.Column="2"/>
+                                Grid.Row="3" Grid.Column="2"/>
 
                         <!-- Minimum Price -->
                         <Label Text="Minimum Price:"
-                               Grid.Row="4"
-                               Grid.Column="0"
+                               Grid.Row="4" Grid.Column="0"
                                VerticalTextAlignment="Center"/>
                         <Entry x:Name="minimumPriceEntry"
                                Placeholder="₱ :"
                                Keyboard="Numeric"
-                               Grid.Row="4"
-                               Grid.Column="1"
+                               Grid.Row="4" Grid.Column="1"
                                Grid.ColumnSpan="2"/>
                     </Grid>
 
-                    <!-- Buttons -->
                     <StackLayout Orientation="Horizontal"
                                  HorizontalOptions="Center"
                                  Spacing="20"
                                  Margin="0,30,0,0">
                         <Button Text="Save Route"/>
-                        <Button Text="Cancel"
-                                Clicked="OnChangeMinimumRateClicked"/>
+                        <Button Text="Cancel" Clicked="OnChangeMinimumRateClicked"/>
+                    </StackLayout>
+                </StackLayout>
+            </ContentView>
+
+            <!-- Manage Users View -->
+            <ContentView x:Name="ManageUsersView" IsVisible="False">
+                <StackLayout>
+                    <Label Text="Manage Users"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           Margin="0,0,0,10"/>
+
+                    <CollectionView ItemsSource="{Binding Users}"
+                                    SelectionMode="Single"
+                                    SelectedItem="{Binding SelectedUser}"
+                                    HeightRequest="150">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Padding="5">
+                                    <Label Text="{Binding Name}" FontAttributes="Bold"/>
+                                    <Label Text="{Binding Email}" FontSize="12"/>
+                                </StackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Entry Placeholder="Name" Text="{Binding NewUserName}" />
+                    <Entry Placeholder="Email" Text="{Binding NewUserEmail}" Keyboard="Email"/>
+                    <Entry Placeholder="Phone Number" Text="{Binding NewUserPhone}" Keyboard="Telephone"/>
+                    <Entry Placeholder="Password" Text="{Binding NewUserPassword}" IsPassword="True"/>
+
+                    <StackLayout Orientation="Horizontal"
+                                 HorizontalOptions="Center"
+                                 Spacing="10"
+                                 Margin="0,10,0,0">
+                        <Button Text="Add User" Command="{Binding AddUserCommand}"/>
+                        <Button Text="Update User" Command="{Binding UpdateUserCommand}"/>
+                        <Button Text="Delete User" Command="{Binding DeleteUserCommand}"/>
                     </StackLayout>
                 </StackLayout>
             </ContentView>

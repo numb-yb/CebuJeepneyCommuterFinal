@@ -2,103 +2,89 @@
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CebuJeepneyCommuter.Models;
+using CebuJeepneyCommuter.Services;
 using Microsoft.Maui.Controls;
+using System.Threading.Tasks;
 
-public class UserProfileViewModel : INotifyPropertyChanged
+namespace CebuJeepneyCommuter.ViewModels
 {
-    private User currentUser;
-
-    public User CurrentUser
+    public class UserProfileViewModel : INotifyPropertyChanged
     {
-        get => currentUser;
-        set
-        {
-            currentUser = value;
-            OnPropertyChanged(nameof(CurrentUser));
-            OnPropertyChanged(nameof(UserName));
-            OnPropertyChanged(nameof(Email));
-            OnPropertyChanged(nameof(PhoneNumber));
-            OnPropertyChanged(nameof(Password));
-        }
-    }
+        private readonly AdminService adminService = new();
 
-    public string UserName
-    {
-        get => CurrentUser?.Name;
-        set
+        private User currentUser;
+        public User CurrentUser
         {
-            if (CurrentUser != null && CurrentUser.Name != value)
+            get => currentUser;
+            set
             {
-                CurrentUser.Name = value;
-                OnPropertyChanged();
+                currentUser = value;
+                OnPropertyChanged(nameof(CurrentUser));
+                OnPropertyChanged(nameof(UserName));
+                OnPropertyChanged(nameof(Email));
+                OnPropertyChanged(nameof(PhoneNumber));
+                OnPropertyChanged(nameof(Password));
             }
         }
-    }
 
-    public string Email
-    {
-        get => CurrentUser?.Email;
-        set
+        public string UserName
         {
-            if (CurrentUser != null && CurrentUser.Email != value)
+            get => CurrentUser?.Name;
+            set { if (CurrentUser != null && CurrentUser.Name != value) { CurrentUser.Name = value; OnPropertyChanged(); } }
+        }
+
+        public string Email
+        {
+            get => CurrentUser?.Email;
+            set { if (CurrentUser != null && CurrentUser.Email != value) { CurrentUser.Email = value; OnPropertyChanged(); } }
+        }
+
+        public string PhoneNumber
+        {
+            get => CurrentUser?.PhoneNumber;
+            set { if (CurrentUser != null && CurrentUser.PhoneNumber != value) { CurrentUser.PhoneNumber = value; OnPropertyChanged(); } }
+        }
+
+        public string Password
+        {
+            get => CurrentUser?.Password;
+            set { if (CurrentUser != null && CurrentUser.Password != value) { CurrentUser.Password = value; OnPropertyChanged(); } }
+        }
+
+        public ICommand LogoutCommand { get; }
+        public ICommand SaveCommand { get; }
+
+        public UserProfileViewModel()
+        {
+            LogoutCommand = new Command(OnLogout);
+            SaveCommand = new Command(async () => await SaveUserAsync());
+            _ = LoadUserAsync(); // fire-and-forget
+        }
+
+        private async Task LoadUserAsync()
+        {
+            // Simulate load by email (use real login later)
+            string email = "juan@gmail.com";
+            CurrentUser = await adminService.GetUserByEmailAsync(email);
+        }
+
+        private async Task SaveUserAsync()
+        {
+            if (CurrentUser != null)
             {
-                CurrentUser.Email = value;
-                OnPropertyChanged();
+                await adminService.UpdateUserAsync(CurrentUser);
+                await Application.Current.MainPage.DisplayAlert("Success", "Profile updated.", "OK");
             }
         }
-    }
 
-    public string PhoneNumber
-    {
-        get => CurrentUser?.PhoneNumber;
-        set
+        private async void OnLogout()
         {
-            if (CurrentUser != null && CurrentUser.PhoneNumber != value)
-            {
-                CurrentUser.PhoneNumber = value;
-                OnPropertyChanged();
-            }
+            await Application.Current.MainPage.DisplayAlert("Logout", "You have logged out.", "OK");
+            Application.Current.MainPage = new NavigationPage(new Views.MainPage());
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-
-    public string Password
-    {
-        get => CurrentUser?.Password;
-        set
-        {
-            if (CurrentUser != null && CurrentUser.Password != value)
-            {
-                CurrentUser.Password = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public ICommand LogoutCommand { get; }
-
-    public UserProfileViewModel()
-    {
-        // Initialize with dummy user
-        CurrentUser = new User
-        {
-            Name = "Juan Dela Cruz",
-            Email = "juan@gmail.com",
-            PhoneNumber = "09123456789",
-            Password = "password"
-        };
-
-        LogoutCommand = new Command(OnLogout);
-    }
-
-    private async void OnLogout()
-    {
-        await Application.Current.MainPage.DisplayAlert("Logout", "You have logged out.", "OK");
-        Application.Current.MainPage = new NavigationPage(new CebuJeepneyCommuter.Views.MainPage());
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
-

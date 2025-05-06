@@ -24,16 +24,21 @@ namespace CebuJeepneyCommuter.ViewModels
             set => SetProperty(ref _password, value);
         }
 
-        public ICommand SignInCommand => new Command(OnSignIn);
+        public ICommand SignInCommand => new Command(async () => await OnSignIn());
 
-        private async void OnSignIn()
+        private async Task OnSignIn()
         {
+            if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Username and password are required.", "OK");
+                return;
+            }
+
             const string DefaultUsername = "admin";
             const string DefaultPassword = "password123";
 
             if (Username == DefaultUsername && Password == DefaultPassword)
             {
-                // Navigate to the admin home page
                 await Application.Current.MainPage.Navigation.PushAsync(new Views.AdminHomePage());
             }
             else
@@ -43,9 +48,7 @@ namespace CebuJeepneyCommuter.ViewModels
         }
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
         {

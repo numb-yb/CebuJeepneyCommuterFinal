@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace CebuJeepneyCommuter.Models
 {
-    public class User
+    class Admin
     {
-        public int Id { get; set; } // Required for updates/deletes
         public string Name { get; set; }
 
         public string Email { get; set; }
@@ -16,8 +15,5 @@ namespace CebuJeepneyCommuter.Models
         public string PhoneNumber { get; set; }
 
         public string Password { get; set; }
-        public DateTime BirthDate { get; set; }
-
-
     }
 }

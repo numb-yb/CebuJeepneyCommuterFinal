@@ -5,29 +5,25 @@
              x:Class="CebuJeepneyCommuter.Views.AdminLoginPage"
              Title="AdminLogin">
 
-    <ContentPage.BindingContext>
-        <viewModels:AdminLoginViewModel />
-    </ContentPage.BindingContext>
-
     <StackLayout VerticalOptions="Center" Padding="30">
         <Label Text="ADMIN LOGIN"
                FontSize="32"
                HorizontalOptions="Center"
                FontAttributes="Bold" />
 
-        <Entry Placeholder="USERNAME"
+        <Entry x:Name="txtusername" Placeholder="USERNAME"
                TextColor="Black"
                Margin="0,20,0,10"
                BackgroundColor="LightGray"
                Text="{Binding Username}" />
 
-        <Entry Placeholder="PASSWORD"
+        <Entry x:Name="txtpassword" Placeholder="PASSWORD"
                TextColor="Black"
                IsPassword="True"
                BackgroundColor="LightGray"
                Text="{Binding Password}" />
 
-        <Button Text="Sign In"
+        <Button x:Name="btnsignin" Text="Sign In"
                 BackgroundColor="Black"
                 TextColor="White"
                 Command="{Binding SignInCommand}" />
