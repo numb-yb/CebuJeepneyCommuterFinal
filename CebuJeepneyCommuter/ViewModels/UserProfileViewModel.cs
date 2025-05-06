@@ -101,4 +101,4 @@ public class UserProfileViewModel : INotifyPropertyChanged
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
-}
+

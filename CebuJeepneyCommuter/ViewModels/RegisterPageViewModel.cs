@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using CebuJeepneyCommuter.Models;
+using CebuJeepneyCommuter.Services;
+
 
 namespace CebuJeepneyCommuter.ViewModels
 {
@@ -61,17 +64,32 @@ namespace CebuJeepneyCommuter.ViewModels
 
         private async void OnSignUp()
         {
-            // Basic sample check
             if (Password != ConfirmPassword)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", "Passwords do not match", "OK");
+                await Application.Current.MainPage.DisplayAlert("Error", "Passwords do not match.", "OK");
                 return;
             }
 
+            var newUser = new User
+            {
+                Name = Name,
+                Email = Email,
+                PhoneNumber = Number,
+                Password = Password,
+                BirthDate = SelectedDate
+            };
+
+            var userService = new UserService();
+            await userService.SaveUserAsync(newUser);
+
             await Application.Current.MainPage.DisplayAlert(
                 "Account Created",
-                $"Welcome, {NewUser.Name}!\nEmail: {NewUser.Email}\nDOB: {SelectedDate:MMM dd, yyyy}",
+                $"Welcome, {Name}!",
                 "OK");
+
+            // Optional: Clear form or navigate to login page
+            Name = Email = Number = Password = ConfirmPassword = string.Empty;
+            SelectedDate = DateTime.Now;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
