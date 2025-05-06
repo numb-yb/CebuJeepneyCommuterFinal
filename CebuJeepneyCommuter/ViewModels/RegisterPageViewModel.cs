@@ -11,33 +11,7 @@ namespace CebuJeepneyCommuter.ViewModels
 {
     public class RegisterPageViewModel : INotifyPropertyChanged
     {
-        private string name;
-        public string Name
-        {
-            get => name;
-            set { name = value; OnPropertyChanged(); }
-        }
-
-        private string email;
-        public string Email
-        {
-            get => email;
-            set { email = value; OnPropertyChanged(); }
-        }
-
-        private string number;
-        public string Number
-        {
-            get => number;
-            set { number = value; OnPropertyChanged(); }
-        }
-
-        private string password;
-        public string Password
-        {
-            get => password;
-            set { password = value; OnPropertyChanged(); }
-        }
+        public User NewUser { get; set; } = new User();
 
         private string confirmPassword;
         public string ConfirmPassword
@@ -53,6 +27,31 @@ namespace CebuJeepneyCommuter.ViewModels
             set { selectedDate = value; OnPropertyChanged(); }
         }
 
+        // Forward User properties to the View
+        public string Name
+        {
+            get => NewUser.Name;
+            set { NewUser.Name = value; OnPropertyChanged(); }
+        }
+
+        public string Email
+        {
+            get => NewUser.Email;
+            set { NewUser.Email = value; OnPropertyChanged(); }
+        }
+
+        public string Number
+        {
+            get => NewUser.PhoneNumber;
+            set { NewUser.PhoneNumber = value; OnPropertyChanged(); }
+        }
+
+        public string Password
+        {
+            get => NewUser.Password;
+            set { NewUser.Password = value; OnPropertyChanged(); }
+        }
+
         public ICommand SignUpCommand { get; }
 
         public RegisterPageViewModel()
@@ -60,12 +59,18 @@ namespace CebuJeepneyCommuter.ViewModels
             SignUpCommand = new Command(OnSignUp);
         }
 
-        private void OnSignUp()
+        private async void OnSignUp()
         {
-            // You can replace this with your actual sign-up logic
-            Application.Current.MainPage.DisplayAlert(
+            // Basic sample check
+            if (Password != ConfirmPassword)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Passwords do not match", "OK");
+                return;
+            }
+
+            await Application.Current.MainPage.DisplayAlert(
                 "Account Created",
-                $"Welcome, {Name}!\nEmail: {Email}\nDOB: {SelectedDate:MMM dd, yyyy}",
+                $"Welcome, {NewUser.Name}!\nEmail: {NewUser.Email}\nDOB: {SelectedDate:MMM dd, yyyy}",
                 "OK");
         }
 
