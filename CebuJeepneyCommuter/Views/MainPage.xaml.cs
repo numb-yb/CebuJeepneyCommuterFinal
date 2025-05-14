@@ -28,8 +28,8 @@ namespace CebuJeepneyCommuter.Views
 
         private async void OnSignInClicked(object sender, EventArgs e)
         {
-            var email = EmailEntry.Text; // Get email from the Entry
-            var password = PasswordEntry.Text; // Get password from the Entry
+            var email = EmailEntry.Text;
+            var password = PasswordEntry.Text;
 
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
@@ -37,20 +37,20 @@ namespace CebuJeepneyCommuter.Views
                 return;
             }
 
-            // Check if user exists and password matches
-            bool loginSuccess = await _userService.ValidateUserLoginAsync(email, password);
+            var user = await _userService.GetUserByLoginAsync(email, password);
 
-            if (loginSuccess)
+            if (user != null)
             {
-                // Navigate to the UserHomePage if login is successful
+                // ✅ Save the logged-in user to current_user.json
+                await _userService.SaveLoggedInUserAsync(user);
+
+                // ✅ Navigate to the homepage
                 await Navigation.PushAsync(new UserHomePage());
             }
             else
             {
-                // Show error message if credentials are incorrect
                 await DisplayAlert("Login Failed", "Incorrect email or password.", "OK");
             }
         }
-
     }
 }
