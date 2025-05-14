@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
+using CebuJeepneyCommuter.Services;
 
 namespace CebuJeepneyCommuter.ViewModels
 {
@@ -26,6 +27,8 @@ namespace CebuJeepneyCommuter.ViewModels
 
         public ICommand SignInCommand => new Command(async () => await OnSignIn());
 
+        private readonly AdminService _adminService = new();
+
         private async Task OnSignIn()
         {
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
@@ -34,21 +37,20 @@ namespace CebuJeepneyCommuter.ViewModels
                 return;
             }
 
-            const string DefaultUsername = "admin";
-            const string DefaultPassword = "password123";
+            var admin = await _adminService.GetAdminByEmailAndPasswordAsync(Username, Password);
 
-            if (Username == DefaultUsername && Password == DefaultPassword)
+            if (admin != null)
             {
                 await Application.Current.MainPage.Navigation.PushAsync(new Views.AdminHomePage());
             }
             else
             {
-                await Application.Current.MainPage.DisplayAlert("Login Failed", "Incorrect username or password.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Login Failed", "Incorrect credentials.", "OK");
             }
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         protected bool SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
         {
