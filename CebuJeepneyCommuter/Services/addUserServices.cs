@@ -9,6 +9,10 @@ namespace CebuJeepneyCommuter.Services
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "users.json");
 
+        private readonly string loggedInPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "current_user.json");
+
         public async Task SaveUserAsync(User user)
         {
             try
@@ -18,12 +22,15 @@ namespace CebuJeepneyCommuter.Services
                 if (File.Exists(filePath))
                 {
                     string json = await File.ReadAllTextAsync(filePath);
-                    users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
+                    if (!string.IsNullOrWhiteSpace(json) && json.TrimStart().StartsWith("["))
+                    {
+                        users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
+                    }
                 }
 
                 users.Add(user);
 
-                string newJson = JsonSerializer.Serialize(users);
+                string newJson = JsonSerializer.Serialize(users, new JsonSerializerOptions { WriteIndented = true });
                 await File.WriteAllTextAsync(filePath, newJson);
             }
             catch (Exception ex)
@@ -37,9 +44,11 @@ namespace CebuJeepneyCommuter.Services
             if (File.Exists(filePath))
             {
                 string json = await File.ReadAllTextAsync(filePath);
-                List<User> users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
-
-                return users.FirstOrDefault(u => u.Email == email && u.Password == password);
+                if (!string.IsNullOrWhiteSpace(json) && json.TrimStart().StartsWith("["))
+                {
+                    var users = JsonSerializer.Deserialize<List<User>>(json);
+                    return users?.FirstOrDefault(u => u.Email == email && u.Password == password);
+                }
             }
 
             return null;
@@ -50,9 +59,11 @@ namespace CebuJeepneyCommuter.Services
             if (File.Exists(filePath))
             {
                 string json = await File.ReadAllTextAsync(filePath);
-                List<User> users = JsonSerializer.Deserialize<List<User>>(json) ?? new List<User>();
-
-                return users.Any(u => u.Email == email && u.Password == password);
+                if (!string.IsNullOrWhiteSpace(json) && json.TrimStart().StartsWith("["))
+                {
+                    var users = JsonSerializer.Deserialize<List<User>>(json);
+                    return users?.Any(u => u.Email == email && u.Password == password) ?? false;
+                }
             }
 
             return false;
@@ -60,20 +71,12 @@ namespace CebuJeepneyCommuter.Services
 
         public async Task SaveLoggedInUserAsync(User user)
         {
-            string loggedInPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "current_user.json");
-
-            string json = JsonSerializer.Serialize(user);
+            string json = JsonSerializer.Serialize(user, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(loggedInPath, json);
         }
 
         public async Task<User?> GetLoggedInUserAsync()
         {
-            string loggedInPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "current_user.json");
-
             if (File.Exists(loggedInPath))
             {
                 string json = await File.ReadAllTextAsync(loggedInPath);
@@ -82,6 +85,7 @@ namespace CebuJeepneyCommuter.Services
 
             return null;
         }
+
         public async Task UpdateUserAsync(User updatedUser)
         {
             if (File.Exists(filePath))
@@ -93,10 +97,9 @@ namespace CebuJeepneyCommuter.Services
                 if (index != -1)
                 {
                     users[index] = updatedUser;
-                    string newJson = JsonSerializer.Serialize(users);
+                    string newJson = JsonSerializer.Serialize(users, new JsonSerializerOptions { WriteIndented = true });
                     await File.WriteAllTextAsync(filePath, newJson);
 
-                    // Also update the logged-in user file
                     await SaveLoggedInUserAsync(updatedUser);
                 }
             }
