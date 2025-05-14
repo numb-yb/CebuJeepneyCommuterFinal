@@ -60,10 +60,10 @@
                 <!-- Show on Map Button -->
                 <Frame CornerRadius="25" BorderColor="White" HasShadow="False" Padding="0"
                        Grid.Row="2" HorizontalOptions="Center">
-                    <Button Text="Show on map"
+                    <Button Text="Plan Route"
                             Command="{Binding ShowMapCommand}"
                             BackgroundColor="Transparent"
-                            TextColor="White"
+                            TextColor="Black"
                             BorderColor="White"
                             CornerRadius="25"
                             WidthRequest="250"
