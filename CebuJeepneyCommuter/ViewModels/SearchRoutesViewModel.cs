@@ -7,6 +7,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CebuJeepneyCommuter.Models;
 using Microsoft.Maui.Controls;
+using CebuJeepneyCommuter.Views;
+
 
 namespace CebuJeepneyCommuter.ViewModels
 {
@@ -134,10 +136,19 @@ namespace CebuJeepneyCommuter.ViewModels
                 DestinationSuggestions.Add(match);
         }
 
-        private void OnShowMap()
+        private async void OnShowMap()
         {
-            Application.Current.MainPage.DisplayAlert("Map", $"Showing route from {Origin} to {Destination}", "OK");
+            if (!string.IsNullOrEmpty(Origin) && !string.IsNullOrEmpty(Destination))
+            {
+                await Application.Current.MainPage.Navigation.PushAsync(
+                    new BusCodePage(Origin, Destination));
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Please select both Origin and Destination", "OK");
+            }
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged([CallerMemberName] string name = "") =>

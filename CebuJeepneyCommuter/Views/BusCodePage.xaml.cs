@@ -1,13 +1,18 @@
-namespace CebuJeepneyCommuter.Views;
+using CebuJeepneyCommuter.ViewModels;
 
-public partial class BusCodePage : ContentPage
+namespace CebuJeepneyCommuter.Views
 {
-	public BusCodePage()
-	{
-		InitializeComponent();
-	}
-    private async void OnBackButtonClicked(object sender, EventArgs e)
+    public partial class BusCodePage : ContentPage
     {
-        await Navigation.PopAsync();
+        public BusCodePage(string origin, string destination)
+        {
+            InitializeComponent();
+            BindingContext = new BusCodePageViewModel(origin, destination);
+        }
+
+        private async void OnBackButtonClicked(object sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
+        }
     }
 }

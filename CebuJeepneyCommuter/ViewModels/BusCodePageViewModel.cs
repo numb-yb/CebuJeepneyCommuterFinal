@@ -1,84 +1,66 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CebuJeepneyCommuter.Services;
+using CebuJeepneyCommuter.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CebuJeepneyCommuter.ViewModels
 {
     public class BusCodePageViewModel : INotifyPropertyChanged
     {
-        // Bus type options
-        public ObservableCollection<string> BusTypes { get; } = new()
-        {
-            "MyBus", "Jeepney", "Beep"
-        };
-
-        // Classification options
-        public ObservableCollection<string> Classifications { get; } = new()
-        {
-            "Economy", "Regular"
-        };
-
-        // Available bus codes
-        public ObservableCollection<string> AvailableBuses { get; } = new()
-        {
-            "Code 1", "Code 2"
-        };
+        public ObservableCollection<string> BusTypes { get; } = new() { "MyBus", "Jeepney", "Beep" };
+        public ObservableCollection<string> Classifications { get; } = new() { "Economy", "Regular" };
+        public ObservableCollection<string> AvailableBuses { get; } = new();
 
         private string selectedBusType;
         public string SelectedBusType
         {
             get => selectedBusType;
-            set
-            {
-                if (selectedBusType != value)
-                {
-                    selectedBusType = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { selectedBusType = value; OnPropertyChanged(); }
         }
 
         private string selectedClassification;
         public string SelectedClassification
         {
             get => selectedClassification;
-            set
-            {
-                if (selectedClassification != value)
-                {
-                    selectedClassification = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { selectedClassification = value; OnPropertyChanged(); }
         }
 
         private string selectedAvailableBus;
         public string SelectedAvailableBus
         {
             get => selectedAvailableBus;
-            set
-            {
-                if (selectedAvailableBus != value)
-                {
-                    selectedAvailableBus = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { selectedAvailableBus = value; OnPropertyChanged(); }
         }
 
         public ICommand ShowMapCommand { get; }
         public ICommand GoBackCommand { get; }
 
-        public BusCodePageViewModel()
+        public BusCodePageViewModel(string origin, string destination)
         {
             ShowMapCommand = new Command(ExecuteShowMap);
-            GoBackCommand = new Command(ExecuteGoBack);
+            GoBackCommand = new Command(async () => await Application.Current.MainPage.Navigation.PopAsync());
+
+            LoadRouteData(origin, destination);
+        }
+
+        private void LoadRouteData(string origin, string destination)
+        {
+            var route = RouteDataService.FindRoute(origin, destination);
+
+            if (route != null)
+            {
+                SelectedBusType = route.Type;
+                SelectedClassification = route.Classification;
+                AvailableBuses.Clear();
+                AvailableBuses.Add(route.Code);
+                SelectedAvailableBus = route.Code;
+            }
+            else
+            {
+                Application.Current.MainPage.DisplayAlert("Route not found", "No route matches your selection.", "OK");
+            }
         }
 
         private void ExecuteShowMap()
@@ -87,11 +69,6 @@ namespace CebuJeepneyCommuter.ViewModels
                 "Map Info",
                 $"Showing: {SelectedBusType}, {SelectedClassification}, {SelectedAvailableBus}",
                 "OK");
-        }
-
-        private async void ExecuteGoBack()
-        {
-            await Application.Current.MainPage.Navigation.PopAsync();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

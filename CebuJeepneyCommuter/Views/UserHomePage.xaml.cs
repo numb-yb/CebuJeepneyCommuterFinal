@@ -20,14 +20,11 @@ namespace CebuJeepneyCommuter.Views
         }
         private async void OnBusCodeClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new BusCodePage());
+        await Navigation.PushAsync(new BusCodePage("SampleOrigin", "SampleDestination"));
         }
         private async void OnProfileTapped(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new UserProfilePage());
         }
-
-
-
     }
 }
