@@ -6,9 +6,9 @@
              Title="UserProfilePage"
              BackgroundColor="White">
 
-    <!--<ContentPage.BindingContext>
+    <ContentPage.BindingContext>
         <viewmodel:UserProfileViewModel />
-         </ContentPage.BindingContext>-->
+    </ContentPage.BindingContext>
 
     <ContentPage.Content>
         <StackLayout Padding="20">

@@ -46,16 +46,17 @@
                              VerticalOptions="Center"
                              HorizontalOptions="Center"
                              Spacing="2">
-                    <Label Text="FirstName LastName"
-                                 TextColor="Black"
-                                 FontAttributes="Bold"
-                                 FontSize="14"
-                                 HorizontalTextAlignment="Center"/>
-                    <Label Text="@gmail"
-                           TextColor="Black"
-                           FontSize="12"
-                           HorizontalTextAlignment="Center"/>
+                    <Label Text="{Binding UserName}"
+                       TextColor="Black"
+                       FontAttributes="Bold"
+                       FontSize="14"
+                       HorizontalTextAlignment="Center"/>
+                    <Label Text="{Binding UserEmail}"
+                       TextColor="Black"
+                       FontSize="12"
+                       HorizontalTextAlignment="Center"/>
                 </StackLayout>
+
 
                 <!-- Profile Icon -->
                 <Image Source="profile2.png"

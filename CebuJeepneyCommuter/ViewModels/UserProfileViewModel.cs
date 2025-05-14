@@ -10,7 +10,7 @@ namespace CebuJeepneyCommuter.ViewModels
 {
     public class UserProfileViewModel : INotifyPropertyChanged
     {
-        private readonly AdminService adminService = new();
+        private readonly UserService userService = new();
 
         private User currentUser;
         public User CurrentUser
@@ -58,21 +58,19 @@ namespace CebuJeepneyCommuter.ViewModels
         {
             LogoutCommand = new Command(OnLogout);
             SaveCommand = new Command(async () => await SaveUserAsync());
-            _ = LoadUserAsync(); // fire-and-forget
+            _ = LoadUserAsync();
         }
 
         private async Task LoadUserAsync()
         {
-            // Simulate load by email (use real login later)
-            string email = "juan@gmail.com";
-            CurrentUser = await adminService.GetUserByEmailAsync(email);
+            CurrentUser = await userService.GetLoggedInUserAsync(); // 🔥 Uses saved login
         }
 
         private async Task SaveUserAsync()
         {
             if (CurrentUser != null)
             {
-                await adminService.UpdateUserAsync(CurrentUser);
+                await userService.UpdateUserAsync(CurrentUser); // You must add this in your service
                 await Application.Current.MainPage.DisplayAlert("Success", "Profile updated.", "OK");
             }
         }

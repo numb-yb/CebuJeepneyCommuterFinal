@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using CebuJeepneyCommuter.Models;
 using CebuJeepneyCommuter.Services;
-
 
 namespace CebuJeepneyCommuter.ViewModels
 {
@@ -80,16 +75,29 @@ namespace CebuJeepneyCommuter.ViewModels
             };
 
             var userService = new UserService();
-            await userService.SaveUserAsync(newUser);
 
-            await Application.Current.MainPage.DisplayAlert(
-                "Account Created",
-                $"Welcome, {Name}!",
-                "OK");
+            try
+            {
+                await userService.SaveUserAsync(newUser);
+                await userService.SaveLoggedInUserAsync(newUser); // ✅ Save current user to a separate file
 
-            // Optional: Clear form or navigate to login page
-            Name = Email = Number = Password = ConfirmPassword = string.Empty;
-            SelectedDate = DateTime.Now;
+                await Application.Current.MainPage.DisplayAlert(
+                    "Account Created",
+                    $"Welcome, {Name}!",
+                    "OK");
+
+                // Optional: Clear form
+                Name = Email = Number = Password = ConfirmPassword = string.Empty;
+                SelectedDate = DateTime.Now;
+
+                // Optional: Navigate to another page (e.g., ProfilePage)
+                // await Application.Current.MainPage.Navigation.PushAsync(new ProfilePage());
+
+            }
+            catch (Exception ex)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", $"Failed to save user: {ex.Message}", "OK");
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

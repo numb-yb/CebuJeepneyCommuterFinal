@@ -1,16 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CebuJeepneyCommuter.Models;
+using CebuJeepneyCommuter.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CebuJeepneyCommuter.ViewModels
 {
     public class UserHomeViewModel : INotifyPropertyChanged
     {
+        private string userName;
+        public string UserName
+        {
+            get => userName;
+            set { userName = value; OnPropertyChanged(); }
+        }
+
+        private string userEmail;
+        public string UserEmail
+        {
+            get => userEmail;
+            set { userEmail = value; OnPropertyChanged(); }
+        }
+
         public ObservableCollection<string> PassengerTypes { get; set; } = new()
         {
             "Regular", "Senior", "Student", "PWD"
@@ -20,10 +32,22 @@ namespace CebuJeepneyCommuter.ViewModels
         public string SelectedPassengerType
         {
             get => selectedPassengerType;
-            set
+            set { selectedPassengerType = value; OnPropertyChanged(); }
+        }
+
+        public UserHomeViewModel()
+        {
+            LoadLoggedInUser();
+        }
+
+        private async void LoadLoggedInUser()
+        {
+            var userService = new UserService();
+            var user = await userService.GetLoggedInUserAsync();
+            if (user != null)
             {
-                selectedPassengerType = value;
-                OnPropertyChanged();
+                UserName = user.Name;
+                UserEmail = user.Email;
             }
         }
 
