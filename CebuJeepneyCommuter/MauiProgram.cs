@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 using CommunityToolkit.Maui;
 
 namespace CebuJeepneyCommuter;
@@ -10,6 +11,7 @@ public static class MauiProgram
 		var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
+            .UseSkiaSharp(true)
             .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
 			{
