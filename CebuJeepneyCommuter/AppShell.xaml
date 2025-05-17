@@ -9,8 +9,8 @@
 
     <!--<ShellContent Title="Main" ContentTemplate="{DataTemplate views:MainPage}" />-->
     <!--<ShellContent Title="AdminHomePage1" ContentTemplate="{DataTemplate views:AdminHomePage1}"/>-->
-    <!--<ShellContent Route="MainPage" ContentTemplate="{DataTemplate views:MainPage}"/>-->
-    <ShellContent Route="MapUI" ContentTemplate="{DataTemplate views:MapUI}"/>
+    <ShellContent Route="MainPage" ContentTemplate="{DataTemplate views:MainPage}"/>
+    <!--<ShellContent Route="MapUI" ContentTemplate="{DataTemplate views:MapUI}"/>-->
     <!--<ShellContent Route="AdminLoginPage" ContentTemplate="{DataTemplate views:AdminLoginPage}"/>-->
     <!--<ShellContent Route="RegisterPage" ContentTemplate="{DataTemplate views:RegisterPage}"/>-->
     <!--<ShellContent Route="UserHomePage" ContentTemplate="{DataTemplate views:UserHomePage}"/>-->

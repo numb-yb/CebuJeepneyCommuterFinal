@@ -4,147 +4,117 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
+using CebuJeepneyCommuter.Services;
 
 namespace CebuJeepneyCommuter.ViewModels
 {
-    public class SummaryItem
-    {
-        public string Code { get; set; }
-        public string Origin { get; set; }
-        public string Destination { get; set; }
-        public string Fare { get; set; }
-        public string EstimatedArrival { get; set; }
-        public string Date { get; set; }
-    }
-
     public class PaymentPageViewModel : INotifyPropertyChanged
     {
-        private string destination;
-        private string from;
-        private string to;
-        private string price;
-        private string totalFare;
+        public string From { get; set; }
+        public string To { get; set; }
+        public string PassengerType { get; set; }
+        public string Classification { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public string Destination
-        {
-            get => destination;
-            set
-            {
-                if (destination != value)
-                {
-                    destination = value;
-                    OnPropertyChanged();
-                    UpdateTotalFare();
-                }
-            }
-        }
-
-        public string From
-        {
-            get => from;
-            set
-            {
-                if (from != value)
-                {
-                    from = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string To
-        {
-            get => to;
-            set
-            {
-                if (to != value)
-                {
-                    to = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string Price
+        private decimal price;
+        public decimal Price
         {
             get => price;
-            set
-            {
-                if (price != value)
-                {
-                    price = value;
-                    OnPropertyChanged();
-                    UpdateTotalFare();
-                }
-            }
+            set { if (price != value) { price = value; OnPropertyChanged(); } }
         }
 
-        public string TotalFare
+        private decimal discount;
+        public decimal Discount
+        {
+            get => discount;
+            set { if (discount != value) { discount = value; OnPropertyChanged(); } }
+        }
+
+        private decimal totalFare;
+        public decimal TotalFare
         {
             get => totalFare;
-            set
-            {
-                if (totalFare != value)
-                {
-                    totalFare = value;
-                    OnPropertyChanged();
-                }
-            }
+            set { if (totalFare != value) { totalFare = value; OnPropertyChanged(); } }
         }
 
-        public ObservableCollection<SummaryItem> SummaryItems { get; set; }
+        public ObservableCollection<SummaryItem> SummaryItems { get; set; } = new();
 
         public ICommand PayCommand { get; }
         public ICommand GoBackCommand { get; }
 
-        public PaymentPageViewModel()
+        public PaymentPageViewModel(string origin, string destination, string passengerType, string classification)
         {
-            SummaryItems = new ObservableCollection<SummaryItem>
-            {
-                new SummaryItem
-                {
-                    Code = "J101",
-                    Origin = "Ayala",
-                    Destination = "Colon",
-                    Fare = "₱12",
-                    EstimatedArrival = "10:30 AM",
-                    Date = "Apr 10"
-                }
-            };
+            From = origin;
+            To = destination;
+            PassengerType = passengerType;
+            Classification = classification;
+
+            CalculateFare();
 
             PayCommand = new Command(OnPay);
-            GoBackCommand = new Command(OnGoBack);
+            GoBackCommand = new Command(async () => await Application.Current.MainPage.Navigation.PopAsync());
+
+            AddSummaryItem();
+        }
+
+        private void CalculateFare()
+        {
+            var route = RouteDataService.FindRoute(From, To);
+
+            if (route != null)
+            {
+                Price = route.RegularFare;
+
+                // Calculate discount according to PassengerType
+                Discount = PassengerType switch
+                {
+                    "Senior Citizen" => Price * 0.20m,
+                    "Student" => Price * 0.10m,
+                    "PWD" => Price * 0.15m,
+                    _ => 0m,
+                };
+
+                TotalFare = Price - Discount;
+            }
+            else
+            {
+                Price = 0;
+                Discount = 0;
+                TotalFare = 0;
+            }
+        }
+
+        private void AddSummaryItem()
+        {
+            SummaryItems.Clear();
+
+            SummaryItems.Add(new SummaryItem
+            {
+                Code = $"{From}-{To}",
+                Classification = Classification,
+                PassengerType = PassengerType,
+                Fare = TotalFare,
+                EstimatedArrival = DateTime.Now.AddMinutes(30).ToString("hh:mm tt"),
+                Date = DateTime.Now.ToString("MMM dd, yyyy")
+            });
         }
 
         private void OnPay()
         {
-            // Handle payment logic here
-            Application.Current.MainPage.DisplayAlert("Payment", "Payment successful!", "OK");
+            // Implement payment processing logic if needed
         }
 
-        private async void OnGoBack()
-        {
-            // Navigation logic for going back (only works if using Shell or NavigationPage)
-            await Application.Current.MainPage.Navigation.PopAsync();
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = "") =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
 
-        private void UpdateTotalFare()
-        {
-            if (decimal.TryParse(price, out decimal priceValue))
-            {
-                TotalFare = $"₱{priceValue:F2}";
-            }
-            else
-            {
-                TotalFare = "₱0.00";
-            }
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    public class SummaryItem
+    {
+        public string Code { get; set; }
+        public string Classification { get; set; }
+        public string PassengerType { get; set; }
+        public decimal Fare { get; set; }
+        public string EstimatedArrival { get; set; }
+        public string Date { get; set; }
     }
 }

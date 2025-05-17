@@ -1,6 +1,5 @@
 ﻿using CebuJeepneyCommuter.Models;
 using CebuJeepneyCommuter.Services;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -21,18 +20,6 @@ namespace CebuJeepneyCommuter.ViewModels
         {
             get => userEmail;
             set { userEmail = value; OnPropertyChanged(); }
-        }
-
-        public ObservableCollection<string> PassengerTypes { get; set; } = new()
-        {
-            "Regular", "Senior", "Student", "PWD"
-        };
-
-        private string selectedPassengerType;
-        public string SelectedPassengerType
-        {
-            get => selectedPassengerType;
-            set { selectedPassengerType = value; OnPropertyChanged(); }
         }
 
         public UserHomeViewModel()

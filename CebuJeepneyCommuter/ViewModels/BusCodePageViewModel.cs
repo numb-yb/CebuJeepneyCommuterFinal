@@ -1,5 +1,6 @@
 ﻿using CebuJeepneyCommuter.Services;
-using CebuJeepneyCommuter.Models;
+using CebuJeepneyCommuter.Views;
+using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -9,70 +10,117 @@ namespace CebuJeepneyCommuter.ViewModels
 {
     public class BusCodePageViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<string> BusTypes { get; } = new() { "MyBus", "Jeepney", "Beep" };
-        public ObservableCollection<string> Classifications { get; } = new() { "Economy", "Regular" };
-        public ObservableCollection<string> AvailableBuses { get; } = new();
+        public ObservableCollection<string> PassengerTypes { get; } = new()
+        {
+            "Regular",
+            "Senior Citizen",
+            "Student",
+            "PWD"
+        };
+
+        public ObservableCollection<string> BusTypes { get; } = new() { "Jeepney", "MyBus", "Beep" };
+
+        // Updated Classifications to match your route data
+        public ObservableCollection<string> Classifications { get; } = new() { "Regular", "Economy", "Express", "Special" };
+
+        // This will hold the route code(s)
+        public ObservableCollection<string> RouteCodes { get; } = new();
+
+        private string selectedPassengerType;
+        public string SelectedPassengerType
+        {
+            get => selectedPassengerType;
+            set
+            {
+                if (selectedPassengerType != value)
+                {
+                    selectedPassengerType = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         private string selectedBusType;
         public string SelectedBusType
         {
             get => selectedBusType;
-            set { selectedBusType = value; OnPropertyChanged(); }
+            set
+            {
+                if (selectedBusType != value)
+                {
+                    selectedBusType = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
         private string selectedClassification;
         public string SelectedClassification
         {
             get => selectedClassification;
-            set { selectedClassification = value; OnPropertyChanged(); }
+            set
+            {
+                if (selectedClassification != value)
+                {
+                    selectedClassification = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
-        private string selectedAvailableBus;
-        public string SelectedAvailableBus
+        private string selectedRouteCode;
+        public string SelectedRouteCode
         {
-            get => selectedAvailableBus;
-            set { selectedAvailableBus = value; OnPropertyChanged(); }
+            get => selectedRouteCode;
+            set
+            {
+                if (selectedRouteCode != value)
+                {
+                    selectedRouteCode = value;
+                    OnPropertyChanged();
+                }
+            }
         }
+
+        private readonly string origin;
+        private readonly string destination;
 
         public ICommand ShowMapCommand { get; }
-        public ICommand GoBackCommand { get; }
 
         public BusCodePageViewModel(string origin, string destination)
         {
-            ShowMapCommand = new Command(ExecuteShowMap);
-            GoBackCommand = new Command(async () => await Application.Current.MainPage.Navigation.PopAsync());
+            this.origin = origin;
+            this.destination = destination;
 
-            LoadRouteData(origin, destination);
-        }
+            SelectedPassengerType = "Regular";
 
-        private void LoadRouteData(string origin, string destination)
-        {
             var route = RouteDataService.FindRoute(origin, destination);
-
             if (route != null)
             {
                 SelectedBusType = route.Type;
                 SelectedClassification = route.Classification;
-                AvailableBuses.Clear();
-                AvailableBuses.Add(route.Code);
-                SelectedAvailableBus = route.Code;
+
+                RouteCodes.Add(route.Code);
+                SelectedRouteCode = route.Code;
             }
             else
             {
-                Application.Current.MainPage.DisplayAlert("Route not found", "No route matches your selection.", "OK");
+                SelectedBusType = BusTypes[0];
+                SelectedClassification = Classifications[0];
             }
+
+            ShowMapCommand = new Command(OnShowMap);
         }
 
-        private void ExecuteShowMap()
+        private async void OnShowMap()
         {
-            Application.Current.MainPage.DisplayAlert(
-                "Map Info",
-                $"Showing: {SelectedBusType}, {SelectedClassification}, {SelectedAvailableBus}",
-                "OK");
+            var paymentPage = new PaymentPage(origin, destination, SelectedPassengerType, SelectedClassification);
+            paymentPage.BindingContext = new PaymentPageViewModel(origin, destination, SelectedPassengerType, SelectedClassification);
+            await Application.Current.MainPage.Navigation.PushAsync(paymentPage);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        void OnPropertyChanged([CallerMemberName] string name = "") =>
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        protected void OnPropertyChanged([CallerMemberName] string propName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
     }
 }

@@ -1,5 +1,4 @@
-﻿
-namespace CebuJeepneyCommuter.Models
+﻿namespace CebuJeepneyCommuter.Models
 {
     public class RouteInfo
     {
@@ -7,6 +6,9 @@ namespace CebuJeepneyCommuter.Models
         public string Origin { get; set; }
         public string Destination { get; set; }
         public string Type { get; set; } // e.g., Jeepney, MyBus, Beep
-        public string Classification { get; set; } // e.g., Aircon, Non-Aircon
+        public string Classification { get; set; } // e.g., Economy, Regular
+
+        // RegularFare as decimal number
+        public decimal RegularFare { get; set; }
     }
 }

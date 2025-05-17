@@ -12,7 +12,7 @@ namespace CebuJeepneyCommuter.Views
         }
         private async void OnProceedToPaymentClicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new PaymentPage());
+            await Navigation.PushAsync(new PaymentPage("Cebu", "Mandaue", "Student", "Regular"));
         }
         private async void OnSearchRoutesClicked(object sender, EventArgs e)
         {

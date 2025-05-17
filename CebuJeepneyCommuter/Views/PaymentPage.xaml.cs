@@ -1,29 +1,15 @@
-﻿using CebuJeepneyCommuter.ViewModels;
-using Microsoft.Maui.Controls;
-using System;
-using System.Collections.ObjectModel;
+﻿using Microsoft.Maui.Controls;
 
 namespace CebuJeepneyCommuter.Views
 {
     public partial class PaymentPage : ContentPage
     {
-        public PaymentPage()
+        public PaymentPage(string origin, string destination, string passengerType, string classification)
         {
             InitializeComponent();
-         
-        }
-        private async void OnBackButtonClicked(object sender, EventArgs e)
-        {
-            // Navigate to UserHomePage
-            await Navigation.PushAsync(new UserHomePage());
-        }
-        private void OnPaymentButtonClicked(object sender, EventArgs e)
-        {
-            // Handle payment processing logic here
-            // For example, you can navigate to another page or show a message
-            DisplayAlert("Payment", "Payment button clicked!", "OK");
-        }
 
+            // Set the BindingContext to the ViewModel with parameters
+            BindingContext = new ViewModels.PaymentPageViewModel(origin, destination, passengerType, classification);
+        }
     }
-
 }

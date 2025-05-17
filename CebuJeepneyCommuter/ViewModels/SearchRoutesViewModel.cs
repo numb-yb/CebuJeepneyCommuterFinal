@@ -9,7 +9,6 @@ using CebuJeepneyCommuter.Models;
 using Microsoft.Maui.Controls;
 using CebuJeepneyCommuter.Views;
 
-
 namespace CebuJeepneyCommuter.ViewModels
 {
     public class SearchRoutesViewModel : INotifyPropertyChanged
@@ -42,7 +41,7 @@ namespace CebuJeepneyCommuter.ViewModels
                     origin = value;
                     OnPropertyChanged();
                     FilterOriginSuggestions();
-                    FilterDestinationSuggestions(); // Re-filter destinations based on new origin
+                    FilterDestinationSuggestions();
                 }
             }
         }
@@ -54,7 +53,7 @@ namespace CebuJeepneyCommuter.ViewModels
             {
                 destination = value;
                 OnPropertyChanged();
-                FilterDestinationSuggestions(); // Apply destination text filter
+                FilterDestinationSuggestions();
             }
         }
 
@@ -62,11 +61,13 @@ namespace CebuJeepneyCommuter.ViewModels
         public ICommand SelectDestinationCommand { get; }
         public ICommand GoBackCommand { get; }
         public ICommand ShowMapCommand { get; }
+        public ICommand ShowOnMapCommand { get; }
 
         public SearchRoutesViewModel()
         {
             GoBackCommand = new Command(async () => await Application.Current.MainPage.Navigation.PopAsync());
-            ShowMapCommand = new Command(OnShowMap);
+            ShowMapCommand = new Command(OnShowMap); // Existing "PROCEED" button
+            ShowOnMapCommand = new Command(OnShowOnMap); // New red "SHOW ON MAP" button
             SelectOriginCommand = new Command<string>(text => Origin = text);
             SelectDestinationCommand = new Command<string>(text => Destination = text);
 
@@ -149,6 +150,10 @@ namespace CebuJeepneyCommuter.ViewModels
             }
         }
 
+        private void OnShowOnMap()
+        {
+            Application.Current.MainPage.DisplayAlert("Preview Route", $"Map preview for:\n{Origin} ➝ {Destination}", "OK");
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged([CallerMemberName] string name = "") =>

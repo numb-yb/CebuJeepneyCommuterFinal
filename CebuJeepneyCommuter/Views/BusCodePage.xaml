@@ -6,9 +6,7 @@
              x:DataType="viewmodel:BusCodePageViewModel"
              Title="Bus Code Page">
 
-    
-
-    <StackLayout Padding="20">
+    <StackLayout Padding="20" Spacing="15">
         <Label Text="Bus Code"
                FontSize="24"
                HorizontalOptions="Center"
@@ -19,25 +17,36 @@
                 Margin="0,10,0,20" 
                 Clicked="OnBackButtonClicked" />
 
-        <Label Text="Bus Type"
-               FontSize="18"
-               Margin="0,20,0,5"/>
-        <Picker Title="Select Bus Type"
+        <!-- Bus Type picker, disabled as per your original design -->
+        <Picker Title="Bus Type"
                 ItemsSource="{Binding BusTypes}"
                 SelectedItem="{Binding SelectedBusType}"
                 IsEnabled="False"/>
 
-        <Picker Title="Select Bus Classification"
+        <!-- Bus Classification picker, disabled -->
+        <Picker Title="Bus Classification"
                 ItemsSource="{Binding Classifications}"
                 SelectedItem="{Binding SelectedClassification}"
                 IsEnabled="False"/>
 
-        <Picker Title="Select Available Bus"
-                ItemsSource="{Binding AvailableBuses}"
-                SelectedItem="{Binding SelectedAvailableBus}"
+        <!-- Bus Code picker showing the route code -->
+        <Picker Title="Bus Code"
+                ItemsSource="{Binding RouteCodes}"
+                SelectedItem="{Binding SelectedRouteCode}"
                 IsEnabled="False"/>
 
-        <Button Text="Show on map"
+        <Label Text="Passenger Type"
+               TextColor="Black"
+               FontAttributes="Bold"
+               Margin="0,20,0,0"/>
+
+        <Picker Title="Select Type"
+                TextColor="Black"
+                ItemsSource="{Binding PassengerTypes}"
+                SelectedItem="{Binding SelectedPassengerType}"
+                BackgroundColor="White"/>
+
+        <Button Text="PROCEED TO PAYMENT"
                 Command="{Binding ShowMapCommand}"
                 BackgroundColor="White"
                 TextColor="Black"
