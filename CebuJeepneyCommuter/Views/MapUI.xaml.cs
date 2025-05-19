@@ -1,34 +1,23 @@
-using Mapsui.Projections;
-using Mapsui.Tiling;
-using Mapsui.UI.Maui;
-
-namespace CebuJeepneyCommuter.Views;
+﻿namespace CebuJeepneyCommuter.Views;
 
 public partial class MapUI : ContentPage
 {
-    private readonly string origin;
-    private readonly string destination;
+    private string Origin { get; }
+    private string Destination { get; }
 
     public MapUI(string origin, string destination)
     {
         InitializeComponent();
 
-        this.origin = origin;
-        this.destination = destination;
+        Origin = origin;
+        Destination = destination;
 
-        var mapControl = new MapControl();
+        var mapControl = new Mapsui.UI.Maui.MapControl();
 
-        mapControl.Map.Layers.Add(OpenStreetMap.CreateTileLayer());
+        mapControl.Map?.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
 
-        // Coordinates for Cebu, Philippines
-        var (x, y) = SphericalMercator.FromLonLat(123.8854, 10.3157);
-        var cebuCenter = new Mapsui.MPoint(x, y);
-
-        mapControl.Map.Navigator.CenterOn(cebuCenter);
-        mapControl.Map.Navigator.ZoomTo(10);
+        // TODO: Add logic to fetch/display route from origin to destination
 
         Content = mapControl;
     }
 }
-
-    

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CebuJeepneyCommuter.Models;
 using CebuJeepneyCommuter.Services;
+using System.Net.Mail;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -47,6 +48,10 @@ namespace CebuJeepneyCommuter.ViewModels
 
         public ICommand UpdateRateCommand { get; }
         public ICommand SaveRouteCommand { get; }
+        public ICommand AddUserCommand { get; }
+        public ICommand UpdateUserCommand { get; }
+        public ICommand DeleteUserCommand { get; }
+
 
         public AdminHomeViewModel()
         {
@@ -58,6 +63,13 @@ namespace CebuJeepneyCommuter.ViewModels
             SaveRouteCommand = new Command(async () => await OnSaveRouteAsync());
 
             _ = LoadRoutesAsync();
+
+            AddUserCommand = new Command(async () => await AddUserAsync());
+            UpdateUserCommand = new Command(async () => await UpdateUserAsync());
+            DeleteUserCommand = new Command(async () => await DeleteUserAsync());
+
+            _ = LoadUsersAsync();
+
         }
 
         private async Task LoadRoutesAsync()
@@ -249,5 +261,233 @@ namespace CebuJeepneyCommuter.ViewModels
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    
+    public ObservableCollection<User> Users { get; set; } = new ObservableCollection<User>();
+
+        private User selectedUser;
+        public User SelectedUser
+        {
+            get => selectedUser;
+            set
+            {
+                selectedUser = value;
+                OnPropertyChanged();
+                if (value != null)
+                {
+                    NewUserName = value.Name;
+                    NewUserEmail = value.Email;
+                    NewUserPhone = value.PhoneNumber;
+                    NewUserPassword = value.Password;
+                }
+            }
+        }
+        private string newUserName;
+        public string NewUserName
+        {
+            get => newUserName;
+            set { newUserName = value; OnPropertyChanged(); }
+        }
+
+        private string newUserEmail;
+        public string NewUserEmail
+        {
+            get => newUserEmail;
+            set { newUserEmail = value; OnPropertyChanged(); }
+        }
+
+        private string newUserPhone;
+        public string NewUserPhone
+        {
+            get => newUserPhone;
+            set { newUserPhone = value; OnPropertyChanged(); }
+        }
+
+        private string newUserPassword;
+        public string NewUserPassword
+        {
+            get => newUserPassword;
+            set { newUserPassword = value; OnPropertyChanged(); }
+        }
+        private async Task LoadUsersAsync()
+        {
+            var userList = await UserDataService.GetAllUsersAsync();
+            Users.Clear();
+            foreach (var user in userList)
+            {
+                Users.Add(user);
+            }
+        }
+
+
+        private async Task<bool> AddUserAsync()
+        {
+            // Basic validation
+            if (string.IsNullOrWhiteSpace(NewUserName) ||
+                string.IsNullOrWhiteSpace(NewUserEmail) ||
+                string.IsNullOrWhiteSpace(NewUserPhone) ||
+                string.IsNullOrWhiteSpace(NewUserPassword))
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "All fields are required", "OK");
+                return false;
+            }
+
+            // Email format validation
+            try
+            {
+                var addr = new MailAddress(NewUserEmail);
+            }
+            catch
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Invalid email format", "OK");
+                return false;
+            }
+
+            var userList = await UserDataService.GetAllUsersAsync();
+
+            // Prevent duplicate email
+            if (userList.Any(u => u.Email.Equals(NewUserEmail, StringComparison.OrdinalIgnoreCase)))
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Email address already exists", "OK");
+                return false;
+            }
+
+            var newUser = new User
+            {
+                Id = userList.Count > 0 ? userList.Max(u => u.Id) + 1 : 1,
+                Name = NewUserName,
+                Email = NewUserEmail,
+                PhoneNumber = NewUserPhone,
+                Password = NewUserPassword,
+                BirthDate = DateTime.Now // Customize as needed
+            };
+
+            userList.Add(newUser);
+            await UserDataService.SaveUsersAsync(userList);
+            await LoadUsersAsync();
+
+            ClearUserForm();
+            await App.Current.MainPage.DisplayAlert("Success", "User added successfully", "OK");
+            return true;
+        }
+
+        private async Task<bool> UpdateUserAsync()
+{
+    if (SelectedUser == null)
+    {
+        await App.Current.MainPage.DisplayAlert("Error", "Please select a user to update", "OK");
+        return false;
     }
+
+    // Basic validation
+    if (string.IsNullOrWhiteSpace(NewUserName) ||
+        string.IsNullOrWhiteSpace(NewUserEmail) ||
+        string.IsNullOrWhiteSpace(NewUserPhone))
+    {
+        await App.Current.MainPage.DisplayAlert("Error", "Name, Email, and Phone are required", "OK");
+        return false;
+    }
+
+    // Email format validation
+    try
+    {
+        var addr = new MailAddress(NewUserEmail);
+    }
+    catch
+    {
+        await App.Current.MainPage.DisplayAlert("Error", "Invalid email format", "OK");
+        return false;
+    }
+
+    var userList = await UserDataService.GetAllUsersAsync();
+    var userToUpdate = userList.FirstOrDefault(u => u.Id == SelectedUser.Id);
+
+    if (userToUpdate != null)
+    {
+        // Prevent duplicate email on update (except for the same user)
+        if (userList.Any(u => u.Id != SelectedUser.Id && u.Email.Equals(NewUserEmail, StringComparison.OrdinalIgnoreCase)))
+        {
+            await App.Current.MainPage.DisplayAlert("Error", "Another user with the same email already exists", "OK");
+            return false;
+        }
+
+        // Update user fields
+        userToUpdate.Name = NewUserName;
+        userToUpdate.Email = NewUserEmail;
+        userToUpdate.PhoneNumber = NewUserPhone;
+
+        // ✅ Update password only if admin provided a new one
+        if (!string.IsNullOrWhiteSpace(NewUserPassword))
+        {
+            userToUpdate.Password = NewUserPassword;
+        }
+
+        // Save changes to user list
+        await UserDataService.SaveUsersAsync(userList);
+        await LoadUsersAsync();
+
+        ClearUserForm();
+        await App.Current.MainPage.DisplayAlert("Success", "User updated successfully", "OK");
+        return true;
+    }
+    else
+    {
+        await App.Current.MainPage.DisplayAlert("Error", "User not found", "OK");
+        return false;
+    }
+}
+
+        public async Task DeleteUserAsync()
+        {
+            // Validate input fields
+            if (string.IsNullOrWhiteSpace(NewUserName) && string.IsNullOrWhiteSpace(NewUserEmail))
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Please enter user name or email to delete.", "OK");
+                return;
+            }
+
+            var userList = await UserDataService.GetAllUsersAsync();
+
+            // Find user matching input name or email (case insensitive)
+            var userToDelete = userList.FirstOrDefault(u =>
+                (!string.IsNullOrWhiteSpace(NewUserName) && u.Name.Equals(NewUserName, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrWhiteSpace(NewUserEmail) && u.Email.Equals(NewUserEmail, StringComparison.OrdinalIgnoreCase))
+            );
+
+            if (userToDelete == null)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "User not found with the given name or email.", "OK");
+                return;
+            }
+
+            bool confirm = await Application.Current.MainPage.DisplayAlert(
+                "Confirm Delete",
+                $"Are you sure you want to delete {userToDelete.Name}?",
+                "Yes", "No");
+
+            if (!confirm) return;
+
+            await UserDataService.DeleteUserAsync(userToDelete);
+            await LoadUsersAsync(); // Refresh the UI with updated list
+
+            await Application.Current.MainPage.DisplayAlert("Success", "User deleted successfully.", "OK");
+            ClearUserForm();
+
+
+            // Clear input fields
+            ClearUserForm();
+        }
+
+
+
+        private void ClearUserForm()
+        {
+            NewUserName = string.Empty;
+            NewUserEmail = string.Empty;
+            NewUserPhone = string.Empty;
+            NewUserPassword = string.Empty;
+            SelectedUser = null;
+        }
+
+    }
+
 }
