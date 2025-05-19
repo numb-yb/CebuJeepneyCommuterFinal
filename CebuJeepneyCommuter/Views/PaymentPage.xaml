@@ -31,8 +31,12 @@
             </Frame>
 
             <!-- Fare Calculator -->
-            <Frame BackgroundColor="White" Padding="15" CornerRadius="10" HasShadow="True">
-                <VerticalStackLayout Spacing="10">
+            <Frame BackgroundColor="White" 
+                   Padding="15" 
+                   CornerRadius="10" 
+                   HasShadow="True">
+                <VerticalStackLayout 
+                    Spacing="10">
                     <Label Text="Fare Calculator"
                            FontAttributes="Bold"
                            FontSize="18"
@@ -44,28 +48,78 @@
                           ColumnSpacing="10"
                           RowSpacing="10">
 
-                        <Label Text="Passenger Type:" TextColor="Black" VerticalOptions="Center" Grid.Row="0" Grid.Column="0"/>
-                        <Entry Text="{Binding PassengerType}" Grid.Row="0" Grid.Column="1" Placeholder="Passenger Type" IsReadOnly="True" />
+                        <Label Text="Passenger Type:" 
+                               TextColor="Black"
+                               VerticalOptions="Center" 
+                               Grid.Row="0" 
+                               Grid.Column="0"/>
+                        <Entry Text="{Binding PassengerType}" 
+                               TextColor="Black"
+                               Grid.Row="0" Grid.Column="1"
+                               Placeholder="Passenger Type" 
+                               IsReadOnly="True" />
 
-                        <Label Text="Classification:" TextColor="Black" VerticalOptions="Center" Grid.Row="1" Grid.Column="0"/>
-                        <Entry Text="{Binding Classification}" Grid.Row="1" Grid.Column="1" Placeholder="Classification" IsReadOnly="True" />
+                        <Label Text="Classification:" 
+                               TextColor="Black" 
+                               VerticalOptions="Center" 
+                               Grid.Row="1" Grid.Column="0"/>
+                        <Entry Text="{Binding Classification}" 
+                               TextColor="Black"
+                               Grid.Row="1" 
+                               Grid.Column="1" 
+                               Placeholder="Classification" 
+                               IsReadOnly="True" />
 
-                        <Label Text="Price:" TextColor="Black" VerticalOptions="Center" Grid.Row="2" Grid.Column="0"/>
-                        <Entry Text="{Binding Price}" Grid.Row="2" Grid.Column="1" IsReadOnly="True" Keyboard="Numeric" />
+                        <Label Text="Price:" 
+                               TextColor="Black" 
+                               VerticalOptions="Center" 
+                               Grid.Row="2" 
+                               Grid.Column="0"/>
+                        <Entry Text="{Binding Price}" 
+                               TextColor="Black"
+                               Grid.Row="2" 
+                               Grid.Column="1" 
+                               IsReadOnly="True" 
+                               Keyboard="Numeric" />
 
-                        <Label Text="Discount:" TextColor="Black" VerticalOptions="Center" Grid.Row="3" Grid.Column="0"/>
-                        <Entry Text="{Binding Discount}" Grid.Row="3" Grid.Column="1" IsReadOnly="True" Keyboard="Numeric" />
+                        <Label Text="Discount:" 
+                               TextColor="Black" 
+                               VerticalOptions="Center" 
+                               Grid.Row="3" 
+                               Grid.Column="0"/>
+                        <Entry Text="{Binding Discount}" 
+                               TextColor="Black"
+                               Grid.Row="3" 
+                               Grid.Column="1"
+                               IsReadOnly="True" 
+                               Keyboard="Numeric" />
 
-                        <Label Text="Total Fare:" TextColor="Black" FontAttributes="Bold" VerticalOptions="Center" Grid.Row="4" Grid.Column="0"/>
-                        <Label Text="{Binding TotalFare}" Grid.Row="4" Grid.Column="1" FontAttributes="Bold" TextColor="Black" VerticalOptions="Center"/>
+                        <Label Text="Total Fare:" 
+                               TextColor="Black" 
+                               FontAttributes="Bold" 
+                               VerticalOptions="Center" 
+                               Grid.Row="4" 
+                               Grid.Column="0"/>
+                        <Label Text="{Binding TotalFare}" 
+                               Grid.Row="4" 
+                               Grid.Column="1" 
+                               FontAttributes="Bold" 
+                               TextColor="Black" 
+                               VerticalOptions="Center"/>
                     </Grid>
                 </VerticalStackLayout>
             </Frame>
 
             <!-- Summary Section -->
-            <Frame BackgroundColor="#D3D3D3" Padding="10" CornerRadius="10">
-                <Frame BorderColor="Black" Padding="10" HasShadow="False" BackgroundColor="White">
-                    <VerticalStackLayout Spacing="10">
+            <Frame BackgroundColor="#D3D3D3" 
+                   Padding="10" 
+                   CornerRadius="10">
+                <Frame BorderColor="Black" 
+                       Padding="10"
+                       HasShadow="False" 
+                       BackgroundColor="White">
+                    <VerticalStackLayout 
+                        Spacing="10">
                         <Label Text="Summary"
                                FontAttributes="Bold"
                                FontSize="18"
@@ -73,26 +127,48 @@
                                TextColor="Black" />
 
                         <!-- Header Row for Summary -->
-                        <Grid ColumnDefinitions="*,*,*,*,*,*" Padding="5">
-                            <Label Text="Code" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="Classification" Grid.Column="1" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="Passenger Type" Grid.Column="2" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="Fare" Grid.Column="3" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="Estimated Arrival" Grid.Column="4" FontAttributes="Bold" TextColor="Black"/>
-                            <Label Text="Date" Grid.Column="5" FontAttributes="Bold" TextColor="Black"/>
+                        <Grid ColumnDefinitions="*,*,*,*,*,*" 
+                              Padding="5">
+                            <Label Text="Code" FontAttributes="Bold" 
+                                   TextColor="Black"/>
+                            <Label Text="Classification" Grid.Column="1" 
+                                   FontAttributes="Bold" 
+                                   TextColor="Black"/>
+                            <Label Text="Passenger Type" Grid.Column="2" FontAttributes="Bold" 
+                                   TextColor="Black"/>
+                            <Label Text="Fare" Grid.Column="3" FontAttributes="Bold" 
+                                   TextColor="Black"/>
+                            <Label Text="Estimated Arrival" 
+                                   Grid.Column="4" FontAttributes="Bold" 
+                                   TextColor="Black"/>
+                            <Label Text="Date" 
+                                   Grid.Column="5"
+                                   FontAttributes="Bold" TextColor="Black"/>
                         </Grid>
 
                         <!-- Summary Data -->
                         <CollectionView ItemsSource="{Binding SummaryItems}">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid ColumnDefinitions="*,*,*,*,*,*" Padding="5">
-                                        <Label Text="{Binding Code}" TextColor="Black" />
-                                        <Label Text="{Binding Classification}" Grid.Column="1" TextColor="Black"/>
-                                        <Label Text="{Binding PassengerType}" Grid.Column="2" TextColor="Black"/>
-                                        <Label Text="{Binding Fare}" Grid.Column="3" TextColor="Black"/>
-                                        <Label Text="{Binding EstimatedArrival}" Grid.Column="4" TextColor="Black"/>
-                                        <Label Text="{Binding Date}" Grid.Column="5" TextColor="Black"/>
+                                    <Grid ColumnDefinitions="*,*,*,*,*,*" 
+                                          Padding="5">
+                                        <Label Text="{Binding Code}" 
+                                               TextColor="Black" />
+                                        <Label Text="{Binding Classification}"
+                                               Grid.Column="1" 
+                                               TextColor="Black"/>
+                                        <Label Text="{Binding PassengerType}" 
+                                               Grid.Column="2" 
+                                               TextColor="Black"/>
+                                        <Label Text="{Binding Fare}" 
+                                               Grid.Column="3" 
+                                               TextColor="Black"/>
+                                        <Label Text="{Binding EstimatedArrival}"
+                                               Grid.Column="4" 
+                                               TextColor="Black"/>
+                                        <Label Text="{Binding Date}" 
+                                               Grid.Column="5" 
+                                               TextColor="Black"/>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>

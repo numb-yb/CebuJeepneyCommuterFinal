@@ -8,6 +8,7 @@ public partial class AdminHomePage : ContentPage
     public AdminHomePage()
     {
         InitializeComponent();
+        BindingContext = new AdminHomeViewModel();
     }
 
     private void OnCreateNewRouteClicked(object sender, EventArgs e)
@@ -30,12 +31,12 @@ public partial class AdminHomePage : ContentPage
         MinimumRateView.IsVisible = false;
         ManageUsersView.IsVisible = true;
 
-        // Load users from ViewModel
-        if (BindingContext is AdminHomeViewModel vm)
-        {
-            if (vm.LoadUsersCommand.CanExecute(null))
-                vm.LoadUsersCommand.Execute(null);
-        }
+        //// Load users from ViewModel
+        //if (BindingContext is AdminHomeViewModel vm)
+        //{
+        //    if (vm.LoadUsersCommand.CanExecute(null))
+        //        vm.LoadUsersCommand.Execute(null);
+        //}
     }
 
     private async void OnLogoutClicked(object sender, EventArgs e)
@@ -46,4 +47,5 @@ public partial class AdminHomePage : ContentPage
         // Optionally: Clear navigation stack to prevent going back
         Application.Current.MainPage = new NavigationPage(new MainPage());
     }
+
 }

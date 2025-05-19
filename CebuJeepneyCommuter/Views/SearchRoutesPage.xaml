@@ -8,8 +8,12 @@
     <VerticalStackLayout Padding="50" Spacing="-10">
 
         <!-- Top Navigation Bar -->
-        <Frame CornerRadius="25" BackgroundColor="White" HasShadow="False" Padding="0">
-            <Grid ColumnDefinitions="Auto,*" Padding="10">
+        <Frame CornerRadius="25"
+               BackgroundColor="White" 
+               HasShadow="False" 
+               Padding="0">
+            <Grid ColumnDefinitions="Auto,*" 
+                  Padding="10">
                 <Label Text="◀"
                        TextColor="black"
                        FontSize="20"
@@ -27,7 +31,12 @@
         </Frame>
 
         <!-- Origin Entry & Suggestions -->
-        <Frame CornerRadius="25" BorderColor="Black" HasShadow="False" Padding="10,5" BackgroundColor="Black" Margin="0,10,0,0">
+        <Frame CornerRadius="25"
+               BorderColor="Black" 
+               HasShadow="False" 
+               Padding="10,5" 
+               BackgroundColor="Black"
+               Margin="0,10,0,0">
             <VerticalStackLayout>
                 <Entry Placeholder="Origin"
                        Text="{Binding Origin}"
@@ -50,7 +59,12 @@
         </Frame>
 
         <!-- Destination Entry & Suggestions -->
-        <Frame CornerRadius="25" BorderColor="Black" HasShadow="False" Padding="10,5" BackgroundColor="Black" Margin="0,10,0,0">
+        <Frame CornerRadius="25"
+               BorderColor="Black" 
+               HasShadow="False" 
+               Padding="10,5" 
+               BackgroundColor="Black"
+               Margin="0,10,0,0">
             <VerticalStackLayout>
                 <Entry Placeholder="Destination"
                        Text="{Binding Destination}"
@@ -75,7 +89,7 @@
             </VerticalStackLayout>
         </Frame>
 
-        <!-- 🔴 and ⚫ Buttons Side by Side -->
+        <!-- Buttons Side by Side -->
         <HorizontalStackLayout Margin="0,10,0,0" Spacing="10">
             <!-- SHOW ON MAP Button -->
             <Frame CornerRadius="25" BorderColor="White" HasShadow="False" Padding="0">
@@ -89,7 +103,9 @@
             </Frame>
 
             <!-- PROCEED Button -->
-            <Frame CornerRadius="25" BorderColor="White" HasShadow="False" Padding="0">
+            <Frame CornerRadius="25"
+                   BorderColor="White"
+                   HasShadow="False" Padding="0">
                 <Button Text="PROCEED"
                         Command="{Binding ShowMapCommand}"
                         BackgroundColor="Black"

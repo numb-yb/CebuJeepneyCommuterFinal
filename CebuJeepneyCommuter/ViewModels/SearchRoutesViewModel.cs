@@ -8,6 +8,8 @@ using System.Windows.Input;
 using CebuJeepneyCommuter.Models;
 using Microsoft.Maui.Controls;
 using CebuJeepneyCommuter.Views;
+using CebuJeepneyCommuter.Services;
+
 
 namespace CebuJeepneyCommuter.ViewModels
 {
@@ -66,45 +68,56 @@ namespace CebuJeepneyCommuter.ViewModels
         public SearchRoutesViewModel()
         {
             GoBackCommand = new Command(async () => await Application.Current.MainPage.Navigation.PopAsync());
-            ShowMapCommand = new Command(OnShowMap); // Existing "PROCEED" button
-            ShowOnMapCommand = new Command(OnShowOnMap); // New red "SHOW ON MAP" button
+            ShowMapCommand = new Command(OnShowMap);
+            ShowOnMapCommand = new Command(OnShowOnMap);
             SelectOriginCommand = new Command<string>(text => Origin = text);
             SelectDestinationCommand = new Command<string>(text => Destination = text);
 
-            LoadRoutes();
             OriginSuggestions = new ObservableCollection<string>();
             DestinationSuggestions = new ObservableCollection<string>();
+
+            LoadRoutesAsync(); // Change to async load
         }
 
-        private void LoadRoutes()
+        private async void LoadRoutesAsync()
         {
-            var rawRoutes = new List<string>
-            {
-                // JEEPNEYS
-                "Basak - Colon", "Bulacao - SM via Colon", "Bulacao - Ayala via Jones Ave",
-                "Labangon - Carbon via Jones", "Labangon - Colon", "Urgello - IT Park via Jones",
-                "Lahug - Colon via Jones", "Guadalupe - Carbon", "Guadalupe - SM via Mango",
-                "Minglanilla - Carbon", "Minglanilla - SM City Cebu", "Tabunok - Carbon",
-                "Tabunok - Ayala via SRP", "Bulacao - Ayala via SRP", "Lahug - Carbon via Jones Ave",
+            allRoutes = await RouteDataService.GetAllRoutesAsync();
 
-                // MYBUS
-                "Talisay (SM Seaside) - SM City - IT Park", "Minglanilla - SM City Cebu",
-
-                // BEEP
-                "Minglanilla - Ayala via SRP", "Talisay - IT Park via SM City",
-                "Bulacao - Ayala via Colon", "Lawaan - SM City - Ayala", "Minglanilla - Colon"
-            };
-
-            allRoutes = rawRoutes.Select(desc =>
-            {
-                var parts = desc.Split(" - ");
-                return new RouteInfo
-                {
-                    Origin = parts[0].Trim(),
-                    Destination = parts.Length > 1 ? parts[1].Trim() : string.Empty
-                };
-            }).ToList();
+            // Optional: initialize suggestions if needed
+            FilterOriginSuggestions();
+            FilterDestinationSuggestions();
         }
+
+
+        //private void LoadRoutes()
+        //{
+        //    var rawRoutes = new List<string>
+        //    {
+        //        // JEEPNEYS
+        //        "Basak - Colon", "Bulacao - SM via Colon", "Bulacao - Ayala via Jones Ave",
+        //        "Labangon - Carbon via Jones", "Labangon - Colon", "Urgello - IT Park via Jones",
+        //        "Lahug - Colon via Jones", "Guadalupe - Carbon", "Guadalupe - SM via Mango",
+        //        "Minglanilla - Carbon", "Minglanilla - SM City Cebu", "Tabunok - Carbon",
+        //        "Tabunok - Ayala via SRP", "Bulacao - Ayala via SRP", "Lahug - Carbon via Jones Ave",
+
+        //        // MYBUS
+        //        "Talisay (SM Seaside) - SM City - IT Park", "Minglanilla - SM City Cebu",
+
+        //        // BEEP
+        //        "Minglanilla - Ayala via SRP", "Talisay - IT Park via SM City",
+        //        "Bulacao - Ayala via Colon", "Lawaan - SM City - Ayala", "Minglanilla - Colon"
+        //    };
+
+        //    allRoutes = rawRoutes.Select(desc =>
+        //    {
+        //        var parts = desc.Split(" - ");
+        //        return new RouteInfo
+        //        {
+        //            Origin = parts[0].Trim(),
+        //            Destination = parts.Length > 1 ? parts[1].Trim() : string.Empty
+        //        };
+        //    }).ToList();
+        //}
 
         private void FilterOriginSuggestions()
         {
@@ -150,9 +163,16 @@ namespace CebuJeepneyCommuter.ViewModels
             }
         }
 
-        private void OnShowOnMap()
+        private async void OnShowOnMap()
         {
-            Application.Current.MainPage.DisplayAlert("Preview Route", $"Map preview for:\n{Origin} ➝ {Destination}", "OK");
+            if (!string.IsNullOrEmpty(Origin) && !string.IsNullOrEmpty(Destination))
+            {
+                await Application.Current.MainPage.Navigation.PushAsync(new MapUI(Origin, Destination));
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Please select both Origin and Destination", "OK");
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -4,6 +4,7 @@ using Microsoft.Maui.Controls;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace CebuJeepneyCommuter.ViewModels
@@ -20,10 +21,8 @@ namespace CebuJeepneyCommuter.ViewModels
 
         public ObservableCollection<string> BusTypes { get; } = new() { "Jeepney", "MyBus", "Beep" };
 
-        // Updated Classifications to match your route data
         public ObservableCollection<string> Classifications { get; } = new() { "Regular", "Economy", "Express", "Special" };
 
-        // This will hold the route code(s)
         public ObservableCollection<string> RouteCodes { get; } = new();
 
         private string selectedPassengerType;
@@ -94,7 +93,15 @@ namespace CebuJeepneyCommuter.ViewModels
 
             SelectedPassengerType = "Regular";
 
-            var route = RouteDataService.FindRoute(origin, destination);
+            _ = LoadRouteAsync(origin, destination);
+
+            ShowMapCommand = new Command(OnShowMap);
+        }
+
+        private async Task LoadRouteAsync(string origin, string destination)
+        {
+            var route = await RouteDataService.FindRouteAsync(origin, destination);
+
             if (route != null)
             {
                 SelectedBusType = route.Type;
@@ -108,8 +115,6 @@ namespace CebuJeepneyCommuter.ViewModels
                 SelectedBusType = BusTypes[0];
                 SelectedClassification = Classifications[0];
             }
-
-            ShowMapCommand = new Command(OnShowMap);
         }
 
         private async void OnShowMap()

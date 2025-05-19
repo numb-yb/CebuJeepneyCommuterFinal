@@ -21,11 +21,12 @@ namespace CebuJeepneyCommuter.Services
             return JsonSerializer.Deserialize<List<Admin>>(json) ?? new List<Admin>();
         }
 
-        public async Task<Admin?> GetAdminByEmailAndPasswordAsync(string email, string password)
+        public async Task<Admin?> GetAdminByUsernameAndPasswordAsync(string username, string password)
         {
             var admins = await GetAllAdminsAsync();
-            return admins.Find(a => a.Email == email && a.Password == password);
+            return admins.Find(a => a.Username == username && a.Password == password);
         }
+
 
         // New methods for User operations
 

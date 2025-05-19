@@ -37,7 +37,8 @@ namespace CebuJeepneyCommuter.ViewModels
                 return;
             }
 
-            var admin = await _adminService.GetAdminByEmailAndPasswordAsync(Username, Password);
+            var admin = await _adminService.GetAdminByUsernameAndPasswordAsync(Username, Password);
+
 
             if (admin != null)
             {

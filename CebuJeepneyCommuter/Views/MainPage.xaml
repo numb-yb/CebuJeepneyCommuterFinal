@@ -23,23 +23,36 @@
                Margin="0,0,0,20"/>
 
         <!-- Add x:Name to these Entry controls -->
-        <Entry x:Name="EmailEntry" Placeholder="Email address" 
+        <Entry x:Name="EmailEntry" 
+               Placeholder="Email address" 
                Margin="0,0,0,10" 
                BackgroundColor="White"
                TextColor="Black" />
 
-        <Entry x:Name="PasswordEntry" Placeholder="Password" 
+        <Entry x:Name="PasswordEntry" 
+               Placeholder="Password" 
                IsPassword="True" 
                BackgroundColor="White" 
                TextColor="Black" />
 
-        <CheckBox x:Name="RememberMe"
-                   Color="Black" 
-                   BackgroundColor="Transparent" 
-                   VerticalOptions="Center" />
-        <Label Text="Remember me" 
-               VerticalOptions="Center" 
-               TextColor="Black" />
+        <StackLayout Orientation="Horizontal"
+             VerticalOptions="Center"
+             Margin="0,5,0,0"
+             Spacing="5">
+            <CheckBox x:Name="RememberMe"
+              BackgroundColor="Transparent"
+              VerticalOptions="Center"/>
+
+            <Label Text="Remember Me"
+           VerticalOptions="Center"
+           TextColor="Black"
+           Margin="0">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer 
+                        Tapped="OnRememberMeLabelTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </StackLayout>
 
         <Button Text="Sign In" 
                 BackgroundColor="Black" 

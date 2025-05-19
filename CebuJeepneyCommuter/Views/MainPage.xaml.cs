@@ -25,6 +25,10 @@ namespace CebuJeepneyCommuter.Views
         {
             await Navigation.PushAsync(new AdminLoginPage());
         }
+        private void OnRememberMeLabelTapped(object sender, EventArgs e)
+        {
+            RememberMe.IsChecked = !RememberMe.IsChecked;
+        }
 
         private async void OnSignInClicked(object sender, EventArgs e)
         {

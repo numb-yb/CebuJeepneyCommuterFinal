@@ -1,108 +1,253 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Microsoft.Maui.Controls;
 using CebuJeepneyCommuter.Models;
 using CebuJeepneyCommuter.Services;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CebuJeepneyCommuter.ViewModels
 {
     public class AdminHomeViewModel : INotifyPropertyChanged
     {
-        private readonly AdminService _adminService = new();
-
         public event PropertyChangedEventHandler PropertyChanged;
 
-        // Users list for UI binding
-        public ObservableCollection<User> Users { get; set; } = new();
+        public ObservableCollection<string> VehicleTypes { get; set; }
+        public ObservableCollection<string> Stops { get; set; }
 
-        private User _selectedUser;
-        public User SelectedUser
+        private readonly Dictionary<string, List<string>> vehicleStops = new Dictionary<string, List<string>>
         {
-            get => _selectedUser;
-            set => SetProperty(ref _selectedUser, value);
+            { "Jeepney", new List<string> {
+                "Basak", "Colon", "Bulacao", "SM via Colon", "Ayala via Jones Ave", "Labangon",
+                "Carbon via Jones", "Urgello", "IT Park via Jones", "Lahug", "Colon via Jones",
+                "Guadalupe", "Carbon", "SM via Mango", "Minglanilla", "SM City Cebu",
+                "Tabunok", "Ayala via SRP", "Carbon via Jones Ave"
+            }},
+            { "MyBus", new List<string> {
+                "Talisay (SM Seaside)", "SM City", "IT Park", "Minglanilla", "SM City Cebu"
+            }},
+            { "Beep", new List<string> {
+                "Minglanilla", "Ayala via SRP", "Talisay", "IT Park via SM City",
+                "Bulacao", "Ayala via Colon", "Lawaan", "SM City", "Ayala", "Colon"
+            }},
+        };
+
+        private List<RouteInfo> allRoutes;
+        private ObservableCollection<RouteInfo> filteredRoutes;
+        public ObservableCollection<RouteInfo> FilteredRoutes
+        {
+            get => filteredRoutes;
+            set
+            {
+                filteredRoutes = value;
+                OnPropertyChanged();
+            }
         }
 
-        public ICommand LoadUsersCommand => new Command(async () =>
-        {
-            var users = await _adminService.GetAllUsersAsync();
-            Users.Clear();
-            foreach (var user in users)
-                Users.Add(user);
-        });
+        public ICommand UpdateRateCommand { get; }
+        public ICommand SaveRouteCommand { get; }
 
-        public ICommand AddUserCommand => new Command(async () =>
+        public AdminHomeViewModel()
         {
-            if (string.IsNullOrWhiteSpace(NewUserName) || string.IsNullOrWhiteSpace(NewUserEmail))
+            VehicleTypes = new ObservableCollection<string> { "Jeepney", "Beep", "MyBus" };
+            FilteredRoutes = new ObservableCollection<RouteInfo>();
+            Stops = new ObservableCollection<string>();
+
+            UpdateRateCommand = new Command(async () => await OnUpdateRateAsync());
+            SaveRouteCommand = new Command(async () => await OnSaveRouteAsync());
+
+            _ = LoadRoutesAsync();
+        }
+
+        private async Task LoadRoutesAsync()
+        {
+            allRoutes = await RouteDataService.GetAllRoutesAsync();
+            FilterRoutesByVehicleType();
+        }
+
+        private string selectedVehicleType;
+        public string SelectedVehicleType
+        {
+            get => selectedVehicleType;
+            set
             {
-                await Application.Current.MainPage.DisplayAlert("Validation", "Name and Email are required", "OK");
+                if (selectedVehicleType != value)
+                {
+                    selectedVehicleType = value;
+                    OnPropertyChanged();
+                    FilterRoutesByVehicleType();
+                }
+            }
+        }
+
+        private RouteInfo selectedRoute;
+        public RouteInfo SelectedRoute
+        {
+            get => selectedRoute;
+            set
+            {
+                selectedRoute = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private decimal newRate;
+        public decimal NewRate
+        {
+            get => newRate;
+            set
+            {
+                newRate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private void FilterRoutesByVehicleType()
+        {
+            if (allRoutes == null) return;
+
+            var filtered = allRoutes
+                .Where(r => r.Type.Equals(SelectedVehicleType, System.StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            FilteredRoutes = new ObservableCollection<RouteInfo>(filtered);
+
+            var stopsForType = filtered
+                .SelectMany(r => new[] { r.Origin, r.Destination })
+                .Distinct()
+                .OrderBy(stop => stop)
+                .ToList();
+
+            Stops.Clear();
+            foreach (var stop in stopsForType)
+            {
+                Stops.Add(stop);
+            }
+        }
+
+        private async Task OnUpdateRateAsync()
+        {
+            if (SelectedRoute != null)
+            {
+                SelectedRoute.RegularFare = NewRate;
+
+                await RouteDataService.SaveRoutesAsync(allRoutes);
+
+                await App.Current.MainPage.DisplayAlert("Success", $"Updated rate for {SelectedRoute.Code} to ₱{NewRate}", "OK");
+            }
+            else
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Please select a route", "OK");
+            }
+        }
+
+        // -------------------------------
+        // Create Route Section
+        // -------------------------------
+
+        public string NewRouteCode { get; set; }
+
+        private string selectedCreateRouteVehicleType;
+        public string SelectedCreateRouteVehicleType
+        {
+            get => selectedCreateRouteVehicleType;
+            set
+            {
+                if (selectedCreateRouteVehicleType != value)
+                {
+                    selectedCreateRouteVehicleType = value;
+                    OnPropertyChanged();
+                    UpdateStopsForSelectedCreateVehicle();
+                }
+            }
+        }
+
+        private void UpdateStopsForSelectedCreateVehicle()
+        {
+            if (!string.IsNullOrEmpty(SelectedCreateRouteVehicleType) && vehicleStops.ContainsKey(SelectedCreateRouteVehicleType))
+            {
+                var relevantStops = vehicleStops[SelectedCreateRouteVehicleType]
+                    .Distinct()
+                    .OrderBy(s => s)
+                    .ToList();
+
+                Stops.Clear();
+                foreach (var stop in relevantStops)
+                    Stops.Add(stop);
+            }
+            else
+            {
+                Stops.Clear();
+            }
+        }
+
+        public decimal NewRouteMinimumFare { get; set; }
+
+        private string selectedStop1;
+        public string SelectedStop1
+        {
+            get => selectedStop1;
+            set
+            {
+                selectedStop1 = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string selectedStop2;
+        public string SelectedStop2
+        {
+            get => selectedStop2;
+            set
+            {
+                selectedStop2 = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private async Task OnSaveRouteAsync()
+        {
+            if (string.IsNullOrWhiteSpace(NewRouteCode) ||
+                string.IsNullOrWhiteSpace(SelectedCreateRouteVehicleType) ||
+                string.IsNullOrWhiteSpace(SelectedStop1) ||
+                string.IsNullOrWhiteSpace(SelectedStop2) ||
+                NewRouteMinimumFare <= 0)
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Please fill in all fields correctly.", "OK");
                 return;
             }
 
-            var newUser = new User
+            var newRoute = new RouteInfo
             {
-                Name = NewUserName,
-                Email = NewUserEmail,
-                PhoneNumber = NewUserPhone,
-                Password = NewUserPassword
+                Code = NewRouteCode.Trim(),
+                Type = SelectedCreateRouteVehicleType,
+                Origin = SelectedStop1,
+                Destination = SelectedStop2,
+                RegularFare = NewRouteMinimumFare
             };
 
-            await _adminService.AddUserAsync(newUser);
-            Users.Add(newUser);
-            ClearNewUserFields();
-        });
+            allRoutes.Add(newRoute);
 
-        public ICommand DeleteUserCommand => new Command(async () =>
-        {
-            if (SelectedUser == null)
-            {
-                await Application.Current.MainPage.DisplayAlert("Error", "No user selected", "OK");
-                return;
-            }
+            await RouteDataService.SaveRoutesAsync(allRoutes);
 
-            await _adminService.DeleteUserAsync(SelectedUser.Email);
-            Users.Remove(SelectedUser);
-        });
+            FilterRoutesByVehicleType();
 
-        public ICommand UpdateUserCommand => new Command(async () =>
-        {
-            if (SelectedUser == null)
-            {
-                await Application.Current.MainPage.DisplayAlert("Error", "No user selected", "OK");
-                return;
-            }
+            await App.Current.MainPage.DisplayAlert("Success", $"Route '{newRoute.Code}' created successfully.", "OK");
 
-            await _adminService.UpdateUserAsync(SelectedUser);
-            await Application.Current.MainPage.DisplayAlert("Success", "User updated", "OK");
-        });
+            // Clear input fields
+            NewRouteCode = string.Empty;
+            SelectedStop1 = null;
+            SelectedStop2 = null;
+            NewRouteMinimumFare = 0;
 
-        // Fields for adding new user
-        public string NewUserName { get => _newUserName; set => SetProperty(ref _newUserName, value); }
-        public string NewUserEmail { get => _newUserEmail; set => SetProperty(ref _newUserEmail, value); }
-        public string NewUserPhone { get => _newUserPhone; set => SetProperty(ref _newUserPhone, value); }
-        public string NewUserPassword { get => _newUserPassword; set => SetProperty(ref _newUserPassword, value); }
-
-        private string _newUserName;
-        private string _newUserEmail;
-        private string _newUserPhone;
-        private string _newUserPassword;
-
-        private void ClearNewUserFields()
-        {
-            NewUserName = NewUserEmail = NewUserPhone = NewUserPassword = null;
+            OnPropertyChanged(nameof(NewRouteCode));
+            OnPropertyChanged(nameof(SelectedStop1));
+            OnPropertyChanged(nameof(SelectedStop2));
+            OnPropertyChanged(nameof(NewRouteMinimumFare));
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        protected void SetProperty<T>(ref T backingStore, T value, [CallerMemberName] string propertyName = "")
-        {
-            if (EqualityComparer<T>.Default.Equals(backingStore, value)) return;
-            backingStore = value;
-            OnPropertyChanged(propertyName);
-        }
     }
 }

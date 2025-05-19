@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodel="clr-namespace:CebuJeepneyCommuter.ViewModels"
@@ -16,173 +15,219 @@
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar -->
-        <StackLayout Grid.Column="0" BackgroundColor="LightGray" Padding="10">
+        <StackLayout Grid.Column="0" 
+                     BackgroundColor="LightGray" 
+                     Padding="10"
+                     Spacing="15">
             <Label Text="ADMIN DASHBOARD"
                    TextColor="Black"
-                   FontSize="24"
-                   FontAttributes="Bold"/>
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"/>
 
             <Button Text="Change Minimum Rate"
-                    Clicked="OnChangeMinimumRateClicked"/>
+                    Clicked="OnChangeMinimumRateClicked" />
             <Button Text="Create New Route"
-                    Clicked="OnCreateNewRouteClicked"/>
+                    Clicked="OnCreateNewRouteClicked" />
             <Button Text="Manage Users"
-                    Clicked="OnManageUsersClicked"/>
-
+                    Clicked="OnManageUsersClicked" />
             <Button Text="Log Out"
                     Clicked="OnLogoutClicked"
                     Margin="0,20,0,0"
                     BackgroundColor="Blue"
-                    TextColor="Black"/>
+                    TextColor="White"/>
         </StackLayout>
 
         <!-- Main Content -->
-        <StackLayout Grid.Column="1" Padding="20">
+        <ScrollView Grid.Column="1" Padding="20">
+            <StackLayout Spacing="20">
 
-            <!-- Minimum Rate View -->
-            <ContentView x:Name="MinimumRateView" IsVisible="True">
-                <StackLayout>
-                    <Label Text="Change Minimum Rate"
-                           FontSize="24"
-                           FontAttributes="Bold"/>
+                <!-- Minimum Rate View -->
+                <ContentView x:Name="MinimumRateView" 
+                             IsVisible="True">
+                    <Frame Padding="20" 
+                           CornerRadius="10" 
+                           BackgroundColor="Blue">
+                        <StackLayout Spacing="10">
+                            <Label Text="Change Minimum Rate"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Start"
+                   LineBreakMode="NoWrap"
+                   TextColor="Black" />
 
-                    <Label Text="Vehicle Type:"/>
-                    <Picker Title="Select Vehicle Type"
-                            ItemsSource="{Binding VehicleTypes}"
-                            SelectedItem="{Binding SelectedVehicleType}" />
+                            <Label Text="Vehicle Type:" 
+                                   TextColor="Black"/>
+                            <Picker Title="Select Vehicle Type"
+                                    TextColor="Black"
+                                    ItemsSource="{Binding VehicleTypes}"
+                                    SelectedItem="{Binding SelectedVehicleType}" 
+                                    BackgroundColor="White"/>
 
-                    <Label Text="Route:"/>
-                    <Picker Title="Select Route"
-                            ItemsSource="{Binding Routes}"
-                            SelectedItem="{Binding SelectedRoute}" />
+                            <Label Text="Route:" 
+                                   TextColor="Black"/>
+                            <Picker Title="Select Route"
+                                    TextColor="Black"
+                                    ItemsSource="{Binding FilteredRoutes}"
+                                    ItemDisplayBinding="{Binding Code}" 
+                                    SelectedItem="{Binding SelectedRoute}"
+                                    BackgroundColor="White"/>
 
-                    <Label Text="New Minimum Rate:"/>
-                    <Entry x:Name="minimumRateEntry"
-                           Placeholder="₱ : "
-                           Keyboard="Numeric"/>
+                            <Label Text="New Minimum Rate:"
+                                   TextColor="Black"/>
+                            <Entry x:Name="minimumRateEntry"
+                                   Placeholder="₱ :"
+                                   TextColor="Black"
+                                   Text="{Binding NewRate}"
+                                   Keyboard="Numeric"
+                                   BackgroundColor="White" />
 
-                    <StackLayout Orientation="Horizontal"
-                                 HorizontalOptions="Center"
-                                 Spacing="20"
-                                 Margin="0,20,0,0">
-                        <Button Text="Update Rate"/>
-                        <Button Text="Cancel"/>
-                    </StackLayout>
-                </StackLayout>
-            </ContentView>
+                            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="Center"
+                         Spacing="20"
+                         Margin="0,10,0,0">
+                                <Button Text="Update Rate"
+                                         Command="{Binding UpdateRateCommand}"/>
+                                <Button Text="Cancel" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+                </ContentView>
 
-            <!-- Create Route View -->
-            <ContentView x:Name="CreateRouteView" IsVisible="False">
-                <StackLayout>
-                    <Label Text="Create New Route"
-                           FontSize="24"
-                           FontAttributes="Bold" />
 
-                    <Grid ColumnSpacing="10" RowSpacing="15" Margin="0,20,0,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                <!-- Create Route View -->
+                <ContentView x:Name="CreateRouteView" 
+                             IsVisible="False">
+                    <Frame Padding="20" 
+                           CornerRadius="10" 
+                           BackgroundColor="Blue">
+                        <StackLayout Spacing="10">
+                            <Label Text="Create New Route"
+                                   TextColor="Black"
+                                   FontSize="22"
+                                   FontAttributes="Bold" />
 
-                        <!-- Route Code -->
-                        <Label Text="Route Code:"
-                               Grid.Row="0" Grid.Column="0"
-                               VerticalTextAlignment="Center"/>
-                        <Entry x:Name="routeCodeEntry"
-                               Placeholder="Enter Route Code"
-                               Grid.Row="0" Grid.Column="1"
-                               Grid.ColumnSpan="2"/>
+                            <Label Text="Route Code:"
+                                    TextColor="Black"/>
+                            <Entry x:Name="routeCodeEntry" 
+                                   Placeholder="Enter Route Code"
+                                    Text="{Binding NewRouteCode}"
+                                   TextColor="Black"
+                                   BackgroundColor="White"/>
 
-                        <!-- Vehicle Type -->
-                        <Label Text="Vehicle Type:"
-                               Grid.Row="1" Grid.Column="0"
-                               VerticalTextAlignment="Center"/>
-                        <Picker Title="Select Vehicle"
-                                Grid.Row="1" Grid.Column="1"
-                                Grid.ColumnSpan="2"
-                                ItemsSource="{Binding VehicleTypes}"
-                                SelectedItem="{Binding SelectedCreateRouteVehicleType}" />
+                            <Label Text="Vehicle Type:" 
+                                   TextColor="Black"/>
+                            <Picker Title="Select Vehicle"
+                                    TextColor="Black"
+                                    ItemsSource="{Binding VehicleTypes}"
+                                    SelectedItem="{Binding SelectedCreateRouteVehicleType}"
+                                    BackgroundColor="White"/>
 
-                        <!-- Stops -->
-                        <Label Text="Stops:"
-                               Grid.Row="2" Grid.Column="0"
-                               VerticalTextAlignment="Center"/>
-                        <Picker x:Name="stop1Picker"
-                                Title="Start Stop"
-                                Grid.Row="2" Grid.Column="1"/>
-                        <Picker x:Name="stop2Picker"
-                                Title="End Stop"
-                                Grid.Row="2" Grid.Column="2"/>
-                        <Button Text="Add Stop"
-                                Grid.Row="3" Grid.Column="2"/>
+                            <Label Text="Stops:"
+                                   TextColor="Black"/>
+                            <Grid ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Picker x:Name="stop1Picker"
+                                        Title="Start Stop"
+                                        BackgroundColor="White"
+                                        Grid.Column="0"
+                                        ItemsSource="{Binding Stops}"
+                                        SelectedItem="{Binding SelectedStop1}"
+                                        TextColor="Black"/>
+                                <Picker x:Name="stop2Picker"
+                                        Title="End Stop"
+                                        BackgroundColor="White"
+                                        Grid.Column="1"
+                                        ItemsSource="{Binding Stops}"
+                                        SelectedItem="{Binding SelectedStop2}"
+                                        TextColor="Black"/>
+                            </Grid>
+                            <Button Text="Add Stop" 
+                                    HorizontalOptions="End"
+                                     Command="{Binding AddStopCommand}"/>
 
-                        <!-- Minimum Price -->
-                        <Label Text="Minimum Price:"
-                               Grid.Row="4" Grid.Column="0"
-                               VerticalTextAlignment="Center"/>
-                        <Entry x:Name="minimumPriceEntry"
-                               Placeholder="₱ :"
-                               Keyboard="Numeric"
-                               Grid.Row="4" Grid.Column="1"
-                               Grid.ColumnSpan="2"/>
-                    </Grid>
+                            <Label Text="Minimum Price:" 
+                                   TextColor="Black"/>
+                            <Entry x:Name="minimumPriceEntry" 
+                                   Placeholder="₱ :"
+                                   
+                                   Keyboard="Numeric" 
+                                   TextColor="Black"
+                                   BackgroundColor="White"/>
 
-                    <StackLayout Orientation="Horizontal"
-                                 HorizontalOptions="Center"
-                                 Spacing="20"
-                                 Margin="0,30,0,0">
-                        <Button Text="Save Route"/>
-                        <Button Text="Cancel" Clicked="OnChangeMinimumRateClicked"/>
-                    </StackLayout>
-                </StackLayout>
-            </ContentView>
+                            <StackLayout Orientation="Horizontal" 
+                                         HorizontalOptions="Center" 
+                                         Spacing="20" 
+                                         Margin="0,10,0,0">
+                                <Button Text="Save Route"
+                                        Command="{Binding SaveRouteCommand}"/>
+                                <Button Text="Cancel" 
+                                        Clicked="OnChangeMinimumRateClicked" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+                </ContentView>
 
-            <!-- Manage Users View -->
-            <ContentView x:Name="ManageUsersView" IsVisible="False">
-                <StackLayout>
-                    <Label Text="Manage Users"
-                           FontSize="24"
-                           FontAttributes="Bold"
-                           Margin="0,0,0,10"/>
+                <!-- Manage Users View -->
+                <ContentView x:Name="ManageUsersView" 
+                             IsVisible="False">
+                    <Frame Padding="20" 
+                           CornerRadius="10"
+                           BackgroundColor="Blue">
+                        <StackLayout Spacing="10">
+                            <Label Text="Manage Users"
+                                   FontSize="22"
+                                   FontAttributes="Bold"
+                                   TextColor="Black"/>
 
-                    <CollectionView ItemsSource="{Binding Users}"
-                                    SelectionMode="Single"
-                                    SelectedItem="{Binding SelectedUser}"
-                                    HeightRequest="150">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <StackLayout Padding="5">
-                                    <Label Text="{Binding Name}" FontAttributes="Bold"/>
-                                    <Label Text="{Binding Email}" FontSize="12"/>
-                                </StackLayout>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                            <CollectionView ItemsSource="{Binding Users}"
+                                            SelectionMode="Single"
+                                            SelectedItem="{Binding SelectedUser}"
+                                            HeightRequest="150">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame Padding="10" Margin="5" 
+                                               BackgroundColor="White" 
+                                               HasShadow="False">
+                                            <StackLayout>
+                                                <Label Text="{Binding Name}" 
+                                                       FontAttributes="Bold"/>
+                                                <Label Text="{Binding Email}"
+                                                       FontSize="12"/>
+                                            </StackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
 
-                    <Entry Placeholder="Name" Text="{Binding NewUserName}" />
-                    <Entry Placeholder="Email" Text="{Binding NewUserEmail}" Keyboard="Email"/>
-                    <Entry Placeholder="Phone Number" Text="{Binding NewUserPhone}" Keyboard="Telephone"/>
-                    <Entry Placeholder="Password" Text="{Binding NewUserPassword}" IsPassword="True"/>
+                            <Entry Placeholder="Name" Text="{Binding NewUserName}" 
+                                   BackgroundColor="White"/>
+                            <Entry Placeholder="Email" Text="{Binding NewUserEmail}" 
+                                   Keyboard="Email" 
+                                   BackgroundColor="White"/>
+                            <Entry Placeholder="Phone Number" Text="{Binding NewUserPhone}" 
+                                   Keyboard="Telephone" 
+                                   BackgroundColor="White"/>
+                            <Entry Placeholder="Password" Text="{Binding NewUserPassword}" 
+                                   IsPassword="True" 
+                                   BackgroundColor="White"/>
 
-                    <StackLayout Orientation="Horizontal"
-                                 HorizontalOptions="Center"
-                                 Spacing="10"
-                                 Margin="0,10,0,0">
-                        <Button Text="Add User" Command="{Binding AddUserCommand}"/>
-                        <Button Text="Update User" Command="{Binding UpdateUserCommand}"/>
-                        <Button Text="Delete User" Command="{Binding DeleteUserCommand}"/>
-                    </StackLayout>
-                </StackLayout>
-            </ContentView>
-        </StackLayout>
+                            <StackLayout Orientation="Horizontal" 
+                                         HorizontalOptions="Center" 
+                                         Spacing="10" 
+                                         Margin="0,10,0,0">
+                                <Button Text="Add User" Command="{Binding AddUserCommand}" />
+                                <Button Text="Update User" Command="{Binding UpdateUserCommand}" />
+                                <Button Text="Delete User" Command="{Binding DeleteUserCommand}" />
+                            </StackLayout>
+                        </StackLayout>
+                    </Frame>
+                </ContentView>
+
+            </StackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>

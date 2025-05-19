@@ -1,7 +1,7 @@
 [
   {
     "Name": "Admin User",
-    "Email": "Harley@gmail.com",
+    "Username": "admin",
     "PhoneNumber": "09123456789",
     "Password": "00112233"
   }

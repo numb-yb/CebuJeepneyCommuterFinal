@@ -48,51 +48,54 @@ namespace CebuJeepneyCommuter.ViewModels
             PassengerType = passengerType;
             Classification = classification;
 
-            CalculateFare();
-
             PayCommand = new Command(OnPay);
             GoBackCommand = new Command(async () => await Application.Current.MainPage.Navigation.PopAsync());
 
-            AddSummaryItem();
+            _ = CalculateFare();  // Call the calculation and handle UI updates afterward
         }
 
-        private void CalculateFare()
+        private async Task CalculateFare()
         {
-            var route = RouteDataService.FindRoute(From, To);
-
+            var route = await RouteDataService.FindRouteAsync(From, To);
             if (route != null)
             {
                 Price = route.RegularFare;
-
-                // Calculate discount according to PassengerType
-                Discount = PassengerType switch
-                {
-                    "Senior Citizen" => Price * 0.20m,
-                    "Student" => Price * 0.10m,
-                    "PWD" => Price * 0.15m,
-                    _ => 0m,
-                };
-
+                Discount = CalculateDiscount(PassengerType, Price);
                 TotalFare = Price - Discount;
+
+                // Update Summary Item after calculation
+                AddSummaryItem();
             }
             else
             {
                 Price = 0;
                 Discount = 0;
                 TotalFare = 0;
+
+                AddSummaryItem();  // Consider adding a summary item with zero values if no route is found
             }
+        }
+
+        private decimal CalculateDiscount(string passengerType, decimal price)
+        {
+            return passengerType switch
+            {
+                "Senior Citizen" => price * 0.20m,
+                "Student" => price * 0.10m,
+                "PWD" => price * 0.15m,
+                _ => 0m,
+            };
         }
 
         private void AddSummaryItem()
         {
             SummaryItems.Clear();
-
             SummaryItems.Add(new SummaryItem
             {
                 Code = $"{From}-{To}",
                 Classification = Classification,
                 PassengerType = PassengerType,
-                Fare = TotalFare,
+                Fare = TotalFare,  // Ensure this fetches the updated TotalFare
                 EstimatedArrival = DateTime.Now.AddMinutes(30).ToString("hh:mm tt"),
                 Date = DateTime.Now.ToString("MMM dd, yyyy")
             });
