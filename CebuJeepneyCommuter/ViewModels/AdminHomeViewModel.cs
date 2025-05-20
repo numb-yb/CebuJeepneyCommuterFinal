@@ -219,46 +219,94 @@ namespace CebuJeepneyCommuter.ViewModels
             }
         }
 
+        public ObservableCollection<string> ClassificationTypes { get; set; } = new ObservableCollection<string> { "Economy", "Regular" };
+
+        private string selectedCreateRouteClassification;
+        public string SelectedCreateRouteClassification
+        {
+            get => selectedCreateRouteClassification;
+            set
+            {
+                if (selectedCreateRouteClassification != value)
+                {
+                    selectedCreateRouteClassification = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        // Update OnSaveRouteAsync() to include Classification:
         async Task OnSaveRouteAsync()
         {
-            // Create new route object
+            // Validate inputs (optional but recommended)
+            if (string.IsNullOrWhiteSpace(NewRouteCode) ||
+                string.IsNullOrWhiteSpace(SelectedCreateRouteVehicleType) ||
+                string.IsNullOrWhiteSpace(SelectedStop1) ||
+                string.IsNullOrWhiteSpace(SelectedStop2) ||
+                string.IsNullOrWhiteSpace(SelectedCreateRouteClassification) ||
+                NewRouteMinimumFare <= 0)
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Please fill all fields correctly.", "OK");
+                return;
+            }
+
             var newRoute = new RouteInfo
             {
                 Code = NewRouteCode.Trim(),
                 Type = SelectedCreateRouteVehicleType,
                 Origin = SelectedStop1,
                 Destination = SelectedStop2,
+                Classification = SelectedCreateRouteClassification,
                 RegularFare = NewRouteMinimumFare
             };
 
             await RouteDataService.SaveOrUpdateRouteAsync(newRoute);
 
-            // Notify SearchRoutesViewModel to refresh
             MessagingCenter.Send(this, "RoutesUpdated");
 
-            // Clear fields
             ClearRouteInputFields();
 
             await App.Current.MainPage.DisplayAlert("Success", $"Route '{newRoute.Code}' saved/updated successfully.", "OK");
         }
 
+
+        public ObservableCollection<string> RouteClassifications { get; set; } = new ObservableCollection<string>
+{
+    "Economy",
+    "Regular",
+    "Premium"
+};
+
+        // New property for selected classification
+        private string selectedClassification;
+        public string SelectedClassification
+        {
+            get => selectedClassification;
+            set
+            {
+                if (selectedClassification != value)
+                {
+                    selectedClassification = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
         private void ClearRouteInputFields()
         {
             NewRouteCode = string.Empty;
+            SelectedCreateRouteVehicleType = null;
             SelectedStop1 = null;
             SelectedStop2 = null;
+            SelectedCreateRouteClassification = null;
             NewRouteMinimumFare = 0;
 
-            // Notify UI of changes
             OnPropertyChanged(nameof(NewRouteCode));
+            OnPropertyChanged(nameof(SelectedCreateRouteVehicleType));
             OnPropertyChanged(nameof(SelectedStop1));
             OnPropertyChanged(nameof(SelectedStop2));
+            OnPropertyChanged(nameof(SelectedCreateRouteClassification));
             OnPropertyChanged(nameof(NewRouteMinimumFare));
         }
-
-
-
-
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -451,35 +499,31 @@ namespace CebuJeepneyCommuter.ViewModels
             // Find user matching input name or email (case insensitive)
             var userToDelete = userList.FirstOrDefault(u =>
                 (!string.IsNullOrWhiteSpace(NewUserName) && u.Name.Equals(NewUserName, StringComparison.OrdinalIgnoreCase)) ||
-                (!string.IsNullOrWhiteSpace(NewUserEmail) && u.Email.Equals(NewUserEmail, StringComparison.OrdinalIgnoreCase))
-            );
+                (!string.IsNullOrWhiteSpace(NewUserEmail) && u.Email.Equals(NewUserEmail, StringComparison.OrdinalIgnoreCase)));
 
             if (userToDelete == null)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", "User not found with the given name or email.", "OK");
+                await Application.Current.MainPage.DisplayAlert("Error", "User not found.", "OK");
                 return;
             }
 
+            // Confirm deletion
             bool confirm = await Application.Current.MainPage.DisplayAlert(
-                "Confirm Delete",
-                $"Are you sure you want to delete {userToDelete.Name}?",
+                "Confirm Deletion",
+                $"Are you sure you want to delete user '{userToDelete.Name}'?",
                 "Yes", "No");
 
             if (!confirm) return;
 
-            await UserDataService.DeleteUserAsync(userToDelete);
-            await LoadUsersAsync(); // Refresh the UI with updated list
+            // Remove user and save
+            userList.Remove(userToDelete);
+            await UserDataService.SaveUsersAsync(userList);
+            await LoadUsersAsync();
+
+            ClearUserForm();
 
             await Application.Current.MainPage.DisplayAlert("Success", "User deleted successfully.", "OK");
-            ClearUserForm();
-
-
-            // Clear input fields
-            ClearUserForm();
         }
-
-
-
 
         private void ClearUserForm()
         {
