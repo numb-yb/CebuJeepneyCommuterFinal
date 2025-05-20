@@ -47,6 +47,47 @@ namespace CebuJeepneyCommuter.Services
             return routes.Any(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
         }
 
+        public static async Task<RouteInfo> AddRouteAsync(RouteInfo newRoute)
+        {
+            var routes = await GetAllRoutesAsync();
+
+            // Check if route already exists by Code and Type
+            if (routes.Any(r => r.Code.Equals(newRoute.Code, StringComparison.OrdinalIgnoreCase) &&
+                                r.Type.Equals(newRoute.Type, StringComparison.OrdinalIgnoreCase)))
+            {
+                return null; // Already exists
+            }
+
+            routes.Add(newRoute);
+            await SaveRoutesAsync(routes);
+            return newRoute;
+        }
+        public static async Task SaveOrUpdateRouteAsync(RouteInfo newRoute)
+        {
+            var routes = await GetAllRoutesAsync();
+
+            var existingRoute = routes.FirstOrDefault(r =>
+                r.Code.Equals(newRoute.Code, StringComparison.OrdinalIgnoreCase) &&
+                r.Type.Equals(newRoute.Type, StringComparison.OrdinalIgnoreCase));
+
+            if (existingRoute != null)
+            {
+                // Update details
+                existingRoute.Origin = newRoute.Origin;
+                existingRoute.Destination = newRoute.Destination;
+                existingRoute.RegularFare = newRoute.RegularFare;
+            }
+            else
+            {
+                // Add new route
+                routes.Add(newRoute);
+            }
+
+            await SaveRoutesAsync(routes);
+        }
+
+
+
 
 
         // Your default route data

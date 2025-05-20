@@ -89,6 +89,12 @@ namespace CebuJeepneyCommuter.ViewModels
             MatchingRoutes = new ObservableCollection<RouteInfo>();
 
             LoadRoutesAsync();
+
+            // ✅ Subscribe to route updates
+            MessagingCenter.Subscribe<object>(this, "RoutesUpdated", async (sender) =>
+            {
+                await RefreshRoutesAsync();
+            });
         }
 
         private async void LoadRoutesAsync()
@@ -178,5 +184,14 @@ namespace CebuJeepneyCommuter.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         void OnPropertyChanged([CallerMemberName] string name = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        // ✅ This is already present, used by the MessagingCenter
+        public async Task RefreshRoutesAsync()
+        {
+            allRoutes = await RouteDataService.GetAllRoutesAsync();
+            FilterOriginSuggestions();
+            FilterDestinationSuggestions();
+            UpdateMatchingRoutes();
+        }
     }
 }

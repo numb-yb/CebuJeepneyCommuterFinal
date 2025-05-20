@@ -219,27 +219,9 @@ namespace CebuJeepneyCommuter.ViewModels
             }
         }
 
-        private async Task OnSaveRouteAsync()
+        async Task OnSaveRouteAsync()
         {
-            if (string.IsNullOrWhiteSpace(NewRouteCode) ||
-                string.IsNullOrWhiteSpace(SelectedCreateRouteVehicleType) ||
-                string.IsNullOrWhiteSpace(SelectedStop1) ||
-                string.IsNullOrWhiteSpace(SelectedStop2) ||
-                NewRouteMinimumFare <= 0)
-            {
-                await App.Current.MainPage.DisplayAlert("Error", "Please fill in all fields correctly.", "OK");
-                return;
-            }
-
-            // Check for existing route
-            bool routeExists = await RouteDataService.RouteCodeExistsAsync(NewRouteCode);
-            if (routeExists)
-            {
-                await App.Current.MainPage.DisplayAlert("Error", "Route code already exists.", "OK");
-                return;
-            }
-
-            // Create new Route
+            // Create new route object
             var newRoute = new RouteInfo
             {
                 Code = NewRouteCode.Trim(),
@@ -249,13 +231,15 @@ namespace CebuJeepneyCommuter.ViewModels
                 RegularFare = NewRouteMinimumFare
             };
 
-            allRoutes.Add(newRoute);
-            await RouteDataService.SaveRoutesAsync(allRoutes);
+            await RouteDataService.SaveOrUpdateRouteAsync(newRoute);
 
-            // Optionally clear the input fields
+            // Notify SearchRoutesViewModel to refresh
+            MessagingCenter.Send(this, "RoutesUpdated");
+
+            // Clear fields
             ClearRouteInputFields();
 
-            await App.Current.MainPage.DisplayAlert("Success", $"Route '{newRoute.Code}' created successfully.", "OK");
+            await App.Current.MainPage.DisplayAlert("Success", $"Route '{newRoute.Code}' saved/updated successfully.", "OK");
         }
 
         private void ClearRouteInputFields()
