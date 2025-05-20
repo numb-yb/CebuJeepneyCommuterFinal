@@ -145,16 +145,16 @@
                                         SelectedItem="{Binding SelectedStop2}"
                                         TextColor="Black"/>
                             </Grid>
-                            <Button Text="Add Stop" 
+                            <!--<Button Text="Add Stop" 
                                     HorizontalOptions="End"
-                                     Command="{Binding AddStopCommand}"/>
+                                     Command="{Binding AddStopCommand}"/>-->
 
                             <Label Text="Minimum Price:" 
                                    TextColor="Black"/>
-                            <Entry x:Name="minimumPriceEntry" 
+                            <Entry x:Name="minimumPriceEntry"
                                    Placeholder="₱ :"
-                                   
-                                   Keyboard="Numeric" 
+                                   Keyboard="Numeric"
+                                   Text="{Binding MinimumPrice}"
                                    TextColor="Black"
                                    BackgroundColor="White"/>
 

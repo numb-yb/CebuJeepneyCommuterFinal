@@ -10,7 +10,8 @@
 
         // RegularFare as decimal number
         public decimal RegularFare { get; set; }
-        public List<(double Latitude, double Longitude)> PathCoordinates { get; set; }
+        public string DisplayName => $"{Origin} - {Destination}";
 
-}
+
+    }
 }

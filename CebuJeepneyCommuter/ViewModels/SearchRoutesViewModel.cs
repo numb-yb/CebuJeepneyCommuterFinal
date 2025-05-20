@@ -10,7 +10,6 @@ using Microsoft.Maui.Controls;
 using CebuJeepneyCommuter.Views;
 using CebuJeepneyCommuter.Services;
 
-
 namespace CebuJeepneyCommuter.ViewModels
 {
     public class SearchRoutesViewModel : INotifyPropertyChanged
@@ -20,6 +19,7 @@ namespace CebuJeepneyCommuter.ViewModels
         private List<RouteInfo> allRoutes;
         private ObservableCollection<string> originSuggestions;
         private ObservableCollection<string> destinationSuggestions;
+        private ObservableCollection<RouteInfo> matchingRoutes;
 
         public ObservableCollection<string> OriginSuggestions
         {
@@ -33,6 +33,12 @@ namespace CebuJeepneyCommuter.ViewModels
             set { destinationSuggestions = value; OnPropertyChanged(); }
         }
 
+        public ObservableCollection<RouteInfo> MatchingRoutes
+        {
+            get => matchingRoutes;
+            set { matchingRoutes = value; OnPropertyChanged(); }
+        }
+
         public string Origin
         {
             get => origin;
@@ -40,10 +46,11 @@ namespace CebuJeepneyCommuter.ViewModels
             {
                 if (origin != value)
                 {
-                    origin = value;
+                    origin = value?.Trim();
                     OnPropertyChanged();
                     FilterOriginSuggestions();
                     FilterDestinationSuggestions();
+                    UpdateMatchingRoutes();
                 }
             }
         }
@@ -53,9 +60,13 @@ namespace CebuJeepneyCommuter.ViewModels
             get => destination;
             set
             {
-                destination = value;
-                OnPropertyChanged();
-                FilterDestinationSuggestions();
+                if (destination != value)
+                {
+                    destination = value?.Trim();
+                    OnPropertyChanged();
+                    FilterDestinationSuggestions();
+                    UpdateMatchingRoutes();
+                }
             }
         }
 
@@ -75,56 +86,26 @@ namespace CebuJeepneyCommuter.ViewModels
 
             OriginSuggestions = new ObservableCollection<string>();
             DestinationSuggestions = new ObservableCollection<string>();
+            MatchingRoutes = new ObservableCollection<RouteInfo>();
 
-            LoadRoutesAsync(); // Change to async load
+            LoadRoutesAsync();
         }
 
         private async void LoadRoutesAsync()
         {
             allRoutes = await RouteDataService.GetAllRoutesAsync();
-
-            // Optional: initialize suggestions if needed
             FilterOriginSuggestions();
             FilterDestinationSuggestions();
+            UpdateMatchingRoutes();
         }
-
-
-        //private void LoadRoutes()
-        //{
-        //    var rawRoutes = new List<string>
-        //    {
-        //        // JEEPNEYS
-        //        "Basak - Colon", "Bulacao - SM via Colon", "Bulacao - Ayala via Jones Ave",
-        //        "Labangon - Carbon via Jones", "Labangon - Colon", "Urgello - IT Park via Jones",
-        //        "Lahug - Colon via Jones", "Guadalupe - Carbon", "Guadalupe - SM via Mango",
-        //        "Minglanilla - Carbon", "Minglanilla - SM City Cebu", "Tabunok - Carbon",
-        //        "Tabunok - Ayala via SRP", "Bulacao - Ayala via SRP", "Lahug - Carbon via Jones Ave",
-
-        //        // MYBUS
-        //        "Talisay (SM Seaside) - SM City - IT Park", "Minglanilla - SM City Cebu",
-
-        //        // BEEP
-        //        "Minglanilla - Ayala via SRP", "Talisay - IT Park via SM City",
-        //        "Bulacao - Ayala via Colon", "Lawaan - SM City - Ayala", "Minglanilla - Colon"
-        //    };
-
-        //    allRoutes = rawRoutes.Select(desc =>
-        //    {
-        //        var parts = desc.Split(" - ");
-        //        return new RouteInfo
-        //        {
-        //            Origin = parts[0].Trim(),
-        //            Destination = parts.Length > 1 ? parts[1].Trim() : string.Empty
-        //        };
-        //    }).ToList();
-        //}
 
         private void FilterOriginSuggestions()
         {
             var query = Origin?.ToLower() ?? "";
             var matches = allRoutes
-                .Select(r => r.Origin)
-                .Distinct()
+                .Select(r => r.Origin?.Trim())
+                .Where(o => !string.IsNullOrWhiteSpace(o))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Where(o => o.ToLower().StartsWith(query))
                 .OrderBy(o => o)
                 .ToList();
@@ -137,17 +118,36 @@ namespace CebuJeepneyCommuter.ViewModels
         private void FilterDestinationSuggestions()
         {
             var query = Destination?.ToLower() ?? "";
-            var filtered = allRoutes
+            var matches = allRoutes
                 .Where(r => string.IsNullOrEmpty(Origin) || r.Origin.Equals(Origin, StringComparison.OrdinalIgnoreCase))
-                .Select(r => r.Destination)
-                .Distinct()
+                .Select(r => r.Destination?.Trim())
+                .Where(d => !string.IsNullOrWhiteSpace(d))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
                 .Where(d => d.ToLower().StartsWith(query))
                 .OrderBy(d => d)
                 .ToList();
 
             DestinationSuggestions.Clear();
-            foreach (var match in filtered)
+            foreach (var match in matches)
                 DestinationSuggestions.Add(match);
+        }
+
+        private void UpdateMatchingRoutes()
+        {
+            if (string.IsNullOrWhiteSpace(Origin) || string.IsNullOrWhiteSpace(Destination))
+            {
+                MatchingRoutes.Clear();
+                return;
+            }
+
+            var matches = allRoutes
+                .Where(r =>
+                    r.Origin.Equals(Origin, StringComparison.OrdinalIgnoreCase) &&
+                    r.Destination.Equals(Destination, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(r => r.Type)
+                .ToList();
+
+            MatchingRoutes = new ObservableCollection<RouteInfo>(matches);
         }
 
         private async void OnShowMap()
@@ -179,5 +179,4 @@ namespace CebuJeepneyCommuter.ViewModels
         void OnPropertyChanged([CallerMemberName] string name = "") =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
-
 }

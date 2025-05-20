@@ -62,6 +62,7 @@ namespace CebuJeepneyCommuter.ViewModels
             UpdateRateCommand = new Command(async () => await OnUpdateRateAsync());
             SaveRouteCommand = new Command(async () => await OnSaveRouteAsync());
 
+
             _ = LoadRoutesAsync();
 
             AddUserCommand = new Command(async () => await AddUserAsync());
@@ -230,6 +231,15 @@ namespace CebuJeepneyCommuter.ViewModels
                 return;
             }
 
+            // Check for existing route
+            bool routeExists = await RouteDataService.RouteCodeExistsAsync(NewRouteCode);
+            if (routeExists)
+            {
+                await App.Current.MainPage.DisplayAlert("Error", "Route code already exists.", "OK");
+                return;
+            }
+
+            // Create new Route
             var newRoute = new RouteInfo
             {
                 Code = NewRouteCode.Trim(),
@@ -240,24 +250,31 @@ namespace CebuJeepneyCommuter.ViewModels
             };
 
             allRoutes.Add(newRoute);
-
             await RouteDataService.SaveRoutesAsync(allRoutes);
 
-            FilterRoutesByVehicleType();
+            // Optionally clear the input fields
+            ClearRouteInputFields();
 
             await App.Current.MainPage.DisplayAlert("Success", $"Route '{newRoute.Code}' created successfully.", "OK");
+        }
 
-            // Clear input fields
+        private void ClearRouteInputFields()
+        {
             NewRouteCode = string.Empty;
             SelectedStop1 = null;
             SelectedStop2 = null;
             NewRouteMinimumFare = 0;
 
+            // Notify UI of changes
             OnPropertyChanged(nameof(NewRouteCode));
             OnPropertyChanged(nameof(SelectedStop1));
             OnPropertyChanged(nameof(SelectedStop2));
             OnPropertyChanged(nameof(NewRouteMinimumFare));
         }
+
+
+
+
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -433,8 +450,8 @@ namespace CebuJeepneyCommuter.ViewModels
     {
         await App.Current.MainPage.DisplayAlert("Error", "User not found", "OK");
         return false;
-    }
-}
+            }
+        }
 
         public async Task DeleteUserAsync()
         {
@@ -476,6 +493,7 @@ namespace CebuJeepneyCommuter.ViewModels
             // Clear input fields
             ClearUserForm();
         }
+
 
 
 

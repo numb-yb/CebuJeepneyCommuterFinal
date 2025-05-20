@@ -41,6 +41,13 @@ namespace CebuJeepneyCommuter.Services
                 r.Origin.Equals(origin, System.StringComparison.OrdinalIgnoreCase) &&
                 r.Destination.Equals(destination, System.StringComparison.OrdinalIgnoreCase));
         }
+        public static async Task<bool> RouteCodeExistsAsync(string code)
+        {
+            var routes = await GetAllRoutesAsync();
+            return routes.Any(r => r.Code.Equals(code, StringComparison.OrdinalIgnoreCase));
+        }
+
+
 
         // Your default route data
         private static List<RouteInfo> GetDefaultRoutes() => new()
