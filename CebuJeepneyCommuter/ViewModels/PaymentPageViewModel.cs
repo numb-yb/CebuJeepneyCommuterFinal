@@ -2,9 +2,11 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.Maui.Controls;
 using CebuJeepneyCommuter.Services;
+using CebuJeepneyCommuter.Models;
 
 namespace CebuJeepneyCommuter.ViewModels
 {
@@ -36,6 +38,13 @@ namespace CebuJeepneyCommuter.ViewModels
             set { if (totalFare != value) { totalFare = value; OnPropertyChanged(); } }
         }
 
+        private string routeCode;
+        public string RouteCode
+        {
+            get => routeCode;
+            set { if (routeCode != value) { routeCode = value; OnPropertyChanged(); } }
+        }
+
         public ObservableCollection<SummaryItem> SummaryItems { get; set; } = new();
 
         public ICommand PayCommand { get; }
@@ -51,29 +60,29 @@ namespace CebuJeepneyCommuter.ViewModels
             PayCommand = new Command(OnPay);
             GoBackCommand = new Command(async () => await Application.Current.MainPage.Navigation.PopAsync());
 
-            _ = CalculateFare();  // Call the calculation and handle UI updates afterward
+            _ = CalculateFare();
         }
 
         private async Task CalculateFare()
         {
-            var route = await RouteDataService.FindRouteAsync(From, To);
+            RouteInfo route = await RouteDataService.FindRouteAsync(From, To);
+
             if (route != null)
             {
                 Price = route.RegularFare;
+                RouteCode = route.Code; // Get actual jeepney code from data
                 Discount = CalculateDiscount(PassengerType, Price);
                 TotalFare = Price - Discount;
-
-                // Update Summary Item after calculation
-                AddSummaryItem();
             }
             else
             {
                 Price = 0;
                 Discount = 0;
                 TotalFare = 0;
-
-                AddSummaryItem();  // Consider adding a summary item with zero values if no route is found
+                RouteCode = "N/A";
             }
+
+            AddSummaryItem();
         }
 
         private decimal CalculateDiscount(string passengerType, decimal price)
@@ -90,12 +99,13 @@ namespace CebuJeepneyCommuter.ViewModels
         private void AddSummaryItem()
         {
             SummaryItems.Clear();
+
             SummaryItems.Add(new SummaryItem
             {
-                Code = $"{From}-{To}",
+                Code = RouteCode,
                 Classification = Classification,
                 PassengerType = PassengerType,
-                Fare = TotalFare,  // Ensure this fetches the updated TotalFare
+                Fare = TotalFare,
                 EstimatedArrival = DateTime.Now.AddMinutes(30).ToString("hh:mm tt"),
                 Date = DateTime.Now.ToString("MMM dd, yyyy")
             });
@@ -103,7 +113,7 @@ namespace CebuJeepneyCommuter.ViewModels
 
         private void OnPay()
         {
-            // Implement payment processing logic if needed
+            // Implement payment handling logic
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
